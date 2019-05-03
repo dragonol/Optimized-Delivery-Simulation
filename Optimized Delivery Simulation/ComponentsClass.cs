@@ -18,71 +18,124 @@ namespace Optimized_Delivery_Simulation
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public class Unit
-    {
-        private bool status = false;
-        private Node node = null;
 
-        public bool Status { get => status; set => status = value; }
-        public Node Node { get => node; set => node = value; }
-        public Unit()
+    partial class MainWindow
+    {
+        public class Axis
         {
-            Status = false;
-            Node = null;
+            public static int Horizonal = 0;
+            public static int Vertical = 1;
         }
-    }
-    public class Node
-    {
-        private Node left = null;
-        private Node right = null;
-        private Node up = null;
-        private Node down = null;
-        private int leftDis;
-        private int rightDis;
-        private int upDis;
-        private int downDis;
-        private bool goLeft;
-        private bool goRight;
-        private bool goUp;
-        private bool goDown;
-        private int x;
-        private int y;
-        private bool depot;
-
-        public Node Left { get => left; set => left = value; }
-        public Node Right { get => right; set => right = value; }
-        public Node Up { get => up; set => up = value; }
-        public Node Down { get => down; set => down = value; }
-        public int LeftDis { get => leftDis; set => leftDis = value; }
-        public int RightDis { get => rightDis; set => rightDis = value; }
-        public int UpDis { get => upDis; set => upDis = value; }
-        public int DownDis { get => downDis; set => downDis = value; }
-        public int X { get => x; set => x = value; }
-        public int Y { get => y; set => y = value; }
-        public bool GoLeft { get => goLeft; set => goLeft = value; }
-        public bool GoRight { get => goRight; set => goRight = value; }
-        public bool GoUp { get => goUp; set => goUp = value; }
-        public bool GoDown { get => goDown; set => goDown = value; }
-        public bool Depot { get => depot; set => depot = value; }
-
-        public Node(bool left, bool right, bool up, bool down, int x, int y)
+        public static class Direction
         {
-            GoLeft = left;
-            GoRight = right;
-            GoUp = up;
-            GoDown = down;
-            X = x;
-            Y = y;
-            Left = Right = Up = Down = null;
-            depot = false;
+            public static int Left = 0;
+            public static int Up = 1;
+            public static int Right = 2;
+            public static int Down = 3;
         }
-    }
-    public class TreePath
-    {
-        Dictionary<(int x, int y), (int x, int y)> path;
-        Dictionary<(int x, int y), int> distance;
+        public class Unit
+        {
+            private Point point;
 
-        public Dictionary<(int x, int y), (int x, int y)> Path { get => path; set => path = value; }
-        public Dictionary<(int x, int y), int> Distance { get => distance; set => distance = value; }
+            public Point Point { get => point; set => point = value; }
+            public Unit(int y, int x)
+            {
+                point.X = x;
+                point.Y = y;
+            }
+        }
+        public class RouteUnit : Unit
+        {
+            private int axis;
+
+            public int Axis { get => axis; set => axis = value; }
+            public RouteUnit(int y, int x, int axis) : base(y, x)
+            {
+                Axis = axis;
+            }
+        }
+        public class NodeUnit : Unit
+        {
+            private NodeUnit[] adjacentNodes;
+            private int[] adjacentDistances;
+
+            public NodeUnit[] AdjacentNodes { get => adjacentNodes; set => adjacentNodes = value; }
+            public int[] AdjacentDistances { get => adjacentDistances; set => adjacentDistances = value; }
+            public NodeUnit(int y, int x) : base(y, x)
+            {
+                adjacentNodes = new NodeUnit[4];
+                adjacentDistances = new int[4];
+            }
+            public static void Connect(NodeUnit node1, NodeUnit node2, int dirNode1, int dirNode2, int distance)
+            {
+                node1.AdjacentNodes[dirNode2] = node2;
+                node1.AdjacentDistances[dirNode2] = distance;
+                node2.AdjacentNodes[dirNode1] = node1;
+                node2.AdjacentDistances[dirNode1] = distance;
+            }
+            public static void CreateNode(RouteUnit routeUnit)
+            {
+                int run1 = 1;
+                int run2 = 1;
+                int x = (int)routeUnit.Point.X;
+                int y = (int)routeUnit.Point.Y;
+                NodeUnit node1;
+                NodeUnit node2;
+
+                if (routeUnit.Axis == Axis.Horizonal)
+                {
+                    while ((node1 = (Map[y, x + run1] as NodeUnit)) == null)
+                        run1++;
+                    while ((node2 = (Map[y, x - run2] as NodeUnit)) == null)
+                        run2++;
+
+                    NodeUnit newNode = new NodeUnit(y, x);
+
+                    Connect(newNode, node1, Direction.Left, Direction.Right, run1);
+                    Connect(newNode, node2, Direction.Right, Direction.Left, run2);
+                }
+                else
+                {
+                    while ((node1 = (Map[y + run1, x] as NodeUnit)) == null)
+                        run1++;
+                    while ((node2 = (Map[y - run2, x] as NodeUnit)) == null)
+                        run2++;
+
+                    NodeUnit newNode = new NodeUnit(y, x);
+
+                    Connect(newNode, node1, Direction.Up, Direction.Down, run1);
+                    Connect(newNode, node2, Direction.Down, Direction.Up, run2);
+                }
+            }
+        }
+
+        public class Path
+        {
+            Dictionary<Point, Point> previous;
+            Dictionary<Point, int> distance;
+
+            public Dictionary<Point, Point> Previous { get => previous; set => previous = value; }
+            public Dictionary<Point, int> Distance { get => distance; set => distance = value; }
+            public Path()
+            {
+                previous = new Dictionary<Point, Point>();
+                distance = new Dictionary<Point, int>();
+            }
+        }
+
+        public class Coordinate
+        {
+            private int x;
+            private int y;
+
+            public int X { get => x; set => x = value; }
+            public int Y { get => y; set => y = value; }
+
+            public Coordinate(int y, int x)
+            {
+                X = x;
+                Y = y;
+            }
+        }
     }
 }

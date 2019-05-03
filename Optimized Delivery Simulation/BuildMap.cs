@@ -17,297 +17,179 @@ namespace Optimized_Delivery_Simulation
 {
     partial class MainWindow
     {
-        public void BuildMap(Node node, Unit[,] map, int splitChance, int aveDist)
+        public void GenerateMap(int height, int width, int splitChance, int averageDistance)
         {
-            int width = map.GetLength(1);
-            int height = map.GetLength(0);
-            int distance = random.Next(aveDist, (int)Math.Round(aveDist * 2.0));
-
-            int limRight = Math.Min(width - 1, node.X + distance);
-            int limLeft = Math.Max(0, node.X - distance);
-            int limDown = Math.Min(height - 1, node.Y + distance);
-            int limUp = Math.Max(0, node.Y - distance);
-
-            map[node.Y, node.X].Status = true;
-            map[node.Y, node.X].Node = node;
-            Unit unit;
-           
-            //left
-            if (node.GoLeft)
+            Map = new Unit[height, width];
+            NodeUnit start = new NodeUnit(random.Next(0, height - 1), random.Next(0, width - 1));
+            BuildMap(start, height, width, splitChance, averageDistance);
+        }
+        public (bool build, NodeUnit node) Process(NodeUnit nodeUnit, int[] lim, int direction)
+        {
+            unsafe
             {
-                node.GoLeft = false;
-                if (random.Next(0, splitChance) > 0)
+                int[] position = new int[2];
+                position[0] = (int)nodeUnit.Point.X;
+                position[1] = (int)nodeUnit.Point.Y;
+                int x = (int)nodeUnit.Point.X;
+                int y = (int)nodeUnit.Point.Y;
+
+                int i = 1;
+                int temp = 0;
+                int* m = &temp;
+                int* n = &temp;
+                if (direction % 2 == 0)
+                    n = &i;
+                else
+                    m = &i;
+
+                Unit curr;
+
+                if (nodeUnit.AdjacentNodes[direction] == null)
                 {
-                    bool check = true;
-                    for (int i = node.X - 1; i >= limLeft; i--)
+                    for (; i <= Math.Abs(lim[direction] - position[direction % 2]); i++)
                     {
-                        unit = map[node.Y, i];
-                        if (unit.Status)
+                        curr = Map[y + *m * (direction % 2 * 2 - 1), x + *n * (direction % 2 * 2 - 1)];
+                        if ((curr as NodeUnit) != null)
                         {
-                            if (unit.Node != null)
-                            {
-                                unit.Node.Right = node;
-                                unit.Node.RightDis = Math.Abs(i - node.X);
-                                unit.Node.GoRight = false;
-                                node.Left = unit.Node;
-                                node.LeftDis = Math.Abs(i - node.X);
-                            }
-                            else
-                            {
-                                Node node1;
-                                Node node2;
-                                int run1 = 1;
-                                int run2 = 1;
-                                while (map[node.Y - run1, i].Node == null)
-                                    run1++;
-                                while (map[node.Y + run2, i].Node == null)
-                                    run2++;
-                                node1 = map[node.Y - run1, i].Node;
-                                node2 = map[node.Y + run2, i].Node;
-
-                                Node newNode = new Node(i > 0, false, false, false, i, node.Y);
-                                unit.Status = true;
-                                unit.Node = newNode;
-
-                                node.Left = newNode;
-                                node.LeftDis = Math.Abs(i - node.X);
-                                node1.Down = newNode;
-                                node1.DownDis = run1;
-                                node2.Up = newNode;
-                                node2.UpDis = run2;
-
-                                newNode.Right = node;
-                                newNode.RightDis = node.LeftDis;
-                                newNode.Up = node1;
-                                newNode.UpDis = run1;
-                                newNode.Down = node2;
-                                newNode.DownDis = run2;
-                            }
-                            check = false;
+                            NodeUnit.Connect((NodeUnit)curr, nodeUnit, direction, (direction + 2) % 4, i);
                             break;
                         }
-                        else
-                            unit.Status = true;
+                        else if ((curr as RouteUnit) != null)
+                        {
+                            NodeUnit.CreateNode((RouteUnit)curr);
+                            break;
+                        }
+                        else 
+                            Map[y + *m * (direction % 2 * 2 - 1), x + *n * (direction % 2 * 2 - 1)] = 
+                                new RouteUnit(y + *m * (direction % 2 * 2 - 1), x + *n * (direction % 2 * 2 - 1), direction % 2);
                     }
-                    if (check)
+
+                    i--;
+                    if (Map[y + *m * (direction % 2 * 2 - 1), x + *n * (direction % 2 * 2 - 1)] == null) 
                     {
-                        Node newNode = new Node(limLeft > 0, false, node.Y > 0, node.Y < height - 1, limLeft, node.Y);
-                        newNode.Right = node;
-                        newNode.RightDis = Math.Abs(limLeft - node.X);
-                        node.Left = newNode;
-                        node.LeftDis = Math.Abs(limLeft - node.X);
-                        map[node.Y, limLeft].Node = newNode;
-                        BuildMap(newNode, map,splitChance, aveDist);
+                        curr = Map[y + *m * (direction % 2 * 2 - 1), x + *n * (direction % 2 * 2 - 1)] =
+                            new NodeUnit(y + *m * (direction % 2 * 2 - 1), x + *n * (direction % 2 * 2 - 1));
+                        NodeUnit.Connect((NodeUnit)curr, nodeUnit, direction, (direction + 2) % 4, i);
+                        return (true, (NodeUnit)curr);
                     }
                 }
             }
-            //right
-            if (node.GoRight)
-            {
-                node.GoRight = false;
-                if (random.Next(0, splitChance) > 0)
-                {
-                    bool check = true;
-                    for (int i = node.X + 1; i <= limRight; i++)
-                    {
-                        unit = map[node.Y, i];
-                        if (unit.Status)
-                        {
-                            if (unit.Node != null)
-                            {
-                                unit.Node.Left = node;
-                                unit.Node.LeftDis = Math.Abs(i - node.X);
-                                unit.Node.GoLeft = false;
-                                node.Right = unit.Node;
-                                node.RightDis = Math.Abs(i - node.X);
-                            }
-                            else
-                            {
-                                Node node1;
-                                Node node2;
-                                int run1 = 1;
-                                int run2 = 1;
-                                while (map[node.Y - run1, i].Node == null)
-                                    run1++;
-                                while (map[node.Y + run2, i].Node == null)
-                                    run2++;
-                                node1 = map[node.Y - run1, i].Node;
-                                node2 = map[node.Y + run2, i].Node;
+            return (false, null);
+        }
+        public void BuildMap(NodeUnit nodeUnit, int height, int width, int splitChance, int aveDist)
+        {
+            int x = (int)nodeUnit.Point.X;
+            int y = (int)nodeUnit.Point.Y;
+            int[] distance = new int[4];
+            int[] lim = new int[4];
 
-                                Node newNode = new Node(false, i < width - 1, false, false, i, node.Y);
-                                unit.Status = true;
-                                unit.Node = newNode;
+            Map[y, x] = nodeUnit;
 
-                                node.Right = newNode;
-                                node.RightDis = Math.Abs(i - node.X);
-                                node1.Down = newNode;
-                                node1.DownDis = run1;
-                                node2.Up = newNode;
-                                node2.UpDis = run2;
+            lim[Direction.Left] = Math.Max(0, x - random.Next((int)Math.Round(aveDist * 0.5), (int)Math.Round(aveDist * 1.5)));
+            lim[Direction.Up] = Math.Max(0, y - random.Next((int)Math.Round(aveDist * 0.5), (int)Math.Round(aveDist * 1.5)));
+            lim[Direction.Right] = Math.Min(width - 1, x + random.Next((int)Math.Round(aveDist * 0.5), (int)Math.Round(aveDist * 1.5)));
+            lim[Direction.Down] = Math.Min(height - 1, y + random.Next((int)Math.Round(aveDist * 0.5), (int)Math.Round(aveDist * 1.5)));
 
-                                newNode.Left = node;
-                                newNode.LeftDis = node.RightDis;
-                                newNode.Up = node1;
-                                newNode.UpDis = run1;
-                                newNode.Down = node2;
-                                newNode.DownDis = run2;
-                            }
-                            check = false;
-                            break;
-                        }
-                        else
-                            unit.Status = true;
-                    }
-                    if (check)
-                    {
-                        Node newNode = new Node(false, limRight < width - 1, node.Y > 0, node.Y < height - 1, limRight, node.Y);
-                        newNode.Left = node;
-                        newNode.LeftDis = Math.Abs(limRight - node.X);
-                        node.Right = newNode;
-                        node.RightDis = newNode.LeftDis;
-                        map[node.Y, limRight].Node = newNode;
-                        BuildMap(newNode, map,splitChance, aveDist);
-                    }
-                }
-            }
-            //up
-            if (node.GoUp)
-            {
-                node.GoUp = false;
-                if (random.Next(0, splitChance) > 0)
-                {
-                    bool check = true;
-                    for (int i = node.Y - 1; i >= limUp; i--)
-                    {
-                        unit = map[i, node.X];
-                        if (unit.Status)
-                        {
-                            if (unit.Node != null)
-                            {
-                                unit.Node.Down = node;
-                                unit.Node.DownDis = Math.Abs(i - node.Y);
-                                unit.Node.GoDown = false;
-                                node.Up = unit.Node;
-                                node.UpDis = unit.Node.DownDis;
-                            }
-                            else
-                            {
-                                Node node1;
-                                Node node2;
-                                int run1 = 1;
-                                int run2 = 1;
-                                while (map[i, node.X + run1].Node == null)
-                                    run1++;
-                                while (map[i, node.X - run2].Node == null)
-                                    run2++;
-                                node1 = map[i, node.X + run1].Node;
-                                node2 = map[i, node.X - run2].Node;
+            (bool build, NodeUnit node) result;
+            if ((result = Process(nodeUnit, lim, Direction.Left)).build)
+                BuildMap(result.node, height, width, splitChance, aveDist);
+            if ((result = Process(nodeUnit, lim, Direction.Right)).build)
+                BuildMap(result.node, height, width, splitChance, aveDist);
+            if ((result = Process(nodeUnit, lim, Direction.Up)).build)
+                BuildMap(result.node, height, width, splitChance, aveDist);
+            if ((result = Process(nodeUnit, lim, Direction.Down)).build)
+                BuildMap(result.node, height, width, splitChance, aveDist);
 
-                                Node newNode = new Node(false, false, i > 0, false, node.X, i);
-                                unit.Status = true;
-                                unit.Node = newNode;
+            //// Left
+            //if (nodeUnit.AdjacentNodes[Direction.Left] == null) 
+            //{
+            //    bool check = true;
+            //    for(int i = 1; i <= Math.Abs(lim[Direction.Left]-x); i++)
+            //    {
+            //        Unit curr = Map[y, x - i];
+            //        if ((curr as NodeUnit) != null)
+            //        {
+            //            NodeUnit.Connect((NodeUnit)curr, nodeUnit, Direction.Left, Direction.Right, i);
+            //            check = false;
+            //            break;
+            //        }
+            //        else if ((curr as RouteUnit) != null) 
+            //        {
+            //            NodeUnit.CreateNode((RouteUnit)curr);
+            //            check = false;
+            //            break;
+            //        }
+            //        else
+            //            Map[y, x - i] = new RouteUnit(y, x - i, Axis.Horizonal);
+            //    }
 
-                                node.Up = newNode;
-                                node.UpDis = Math.Abs(i - node.Y);
-                                node1.Left = newNode;
-                                node1.LeftDis = run1;
-                                node2.Right = newNode;
-                                node2.RightDis = run2;
+            //}
 
-                                newNode.Down = node;
-                                newNode.DownDis = node.UpDis;
-                                newNode.Right = node1;
-                                newNode.RightDis = run1;
-                                newNode.Left = node2;
-                                newNode.LeftDis = run2;
-                            }
-                            check = false;
-                            break;
-                        }
-                        else
-                            unit.Status = true;
-                    }
-                    if (check)
-                    {
-                        Node newNode = new Node(node.X > 0, node.X < width - 1, limUp > 0, false, node.X, limUp);
-                        newNode.Down = node;
-                        newNode.DownDis = Math.Abs(limUp - node.Y);
-                        node.Up = newNode;
-                        node.UpDis = newNode.DownDis;
-                        map[limUp, node.X].Node = newNode;
-                        BuildMap(newNode, map,splitChance, aveDist);
-                    }
-                }
-            }
-            //down
-            if (node.GoDown)
-            {
-                node.GoDown = false;
-                if (random.Next(0, splitChance) > 0)
-                {
-                    bool check = true;
-                    for (int i = node.Y + 1; i <= limDown; i++)
-                    {
-                        unit = map[i, node.X];
-                        if (unit.Status)
-                        {
-                            if (unit.Node != null)
-                            {
-                                unit.Node.Up = node;
-                                unit.Node.UpDis = Math.Abs(i - node.Y);
-                                unit.Node.GoUp = false;
-                                node.Down = unit.Node;
-                                node.DownDis = unit.Node.UpDis;
-                            }
-                            else
-                            {
-                                Node node1;
-                                Node node2;
-                                int run1 = 1;
-                                int run2 = 1;
-                                while (map[i, node.X + run1].Node == null)
-                                    run1++;
-                                while (map[i, node.X - run2].Node == null)
-                                    run2++;
-                                node1 = map[i, node.X + run1].Node;
-                                node2 = map[i, node.X - run2].Node;
+            //// Right
+            //if (nodeUnit.AdjacentNodes[Direction.Right] == null)
+            //{
+            //    for (int i = 1; i <= Math.Abs(lim[Direction.Right] - x); i++)
+            //    {
+            //        Unit curr = Map[y, x + i];
+            //        if ((curr as NodeUnit) != null)
+            //        {
+            //            NodeUnit.Connect((NodeUnit)curr, nodeUnit, Direction.Right, Direction.Left, i);
+            //            break;
+            //        }
+            //        else if ((curr as RouteUnit) != null)
+            //        {
+            //            NodeUnit.CreateNode((RouteUnit)curr);
+            //            break;
+            //        }
+            //        else
+            //            Map[y, x + i] = new RouteUnit(y, x + i, Axis.Horizonal);
+            //    }
+            //}
 
-                                Node newNode = new Node(false, false, false, i < height - 1, node.X, i);
-                                unit.Status = true;
-                                unit.Node = newNode;
+            ////Up
+            //if (nodeUnit.AdjacentNodes[Direction.Up] == null)
+            //{
+            //    for (int i = 1; i <= Math.Abs(lim[Direction.Up] - y); i++)
+            //    {
+            //        Unit curr = Map[y - i, x];
+            //        if ((curr as NodeUnit) != null)
+            //        {
+            //            NodeUnit.Connect((NodeUnit)curr, nodeUnit, Direction.Up, Direction.Down, i);
+            //            break;
+            //        }
+            //        else if ((curr as RouteUnit) != null)
+            //        {
+            //            NodeUnit.CreateNode((RouteUnit)curr);
+            //            break;
+            //        }
+            //        else
+            //            Map[y - i, x] = new RouteUnit(y - i, x, Axis.Vertical);
+            //    }
+            //}
 
-                                node.Down = newNode;
-                                node.DownDis = Math.Abs(i - node.Y);
-                                node1.Left = newNode;
-                                node1.LeftDis = run1;
-                                node2.Right = newNode;
-                                node2.RightDis = run2;
+            ////Down
+            //if (nodeUnit.AdjacentNodes[Direction.Down] == null)
+            //{
+            //    for (int i = 1; i <= Math.Abs(lim[Direction.Down] - y); i++)
+            //    {
+            //        Unit curr = Map[y + i, x];
+            //        if ((curr as NodeUnit) != null)
+            //        {
+            //            NodeUnit.Connect((NodeUnit)curr, nodeUnit, Direction.Down, Direction.Up, i);
+            //            break;
+            //        }
+            //        else if ((curr as RouteUnit) != null)
+            //        {
+            //            NodeUnit.CreateNode((RouteUnit)curr);
+            //            break;
+            //        }
+            //        else
+            //            Map[y + i, x] = new RouteUnit(y + i, x, Axis.Vertical);
+            //    }
+            //}
 
-                                newNode.Up = node;
-                                newNode.UpDis = node.DownDis;
-                                newNode.Right = node1;
-                                newNode.RightDis = run1;
-                                newNode.Left = node2;
-                                newNode.LeftDis = run2;
-                            }
-                            check = false;
-                            break;
-                        }
-                        else
-                            unit.Status = true;
-                    }
-                    if (check)
-                    {
-                        Node newNode = new Node(node.X > 0, node.X < width - 1, false, limDown < height - 1, node.X, limDown);
-                        newNode.Up = node;
-                        newNode.UpDis = Math.Abs(limDown - node.Y);
-                        node.Down = newNode;
-                        node.DownDis = newNode.UpDis;
-                        map[limDown, node.X].Node = newNode;
-                        BuildMap(newNode, map,splitChance, aveDist);
-                    }
-                }
-            }
+
+
         }
     }
 }

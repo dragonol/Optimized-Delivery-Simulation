@@ -15,27 +15,27 @@ using System.Windows.Shapes;
 
 namespace Optimized_Delivery_Simulation
 {
-    partial class MainWindow
-    {
-        public void GenerateMap(Unit[,] map, int height, int width, Brush color, int space = 50, int thickness = 30, float dist = 0.2f, int splitChance = 4)
-        {
-            // Initialize map
-            map = new Unit[height, width];
-            for (int i = 0; i < map.GetLength(0); i++)
-                for (int j = 0; j < map.GetLength(1); j++)
-                    map[i, j] = new Unit();
+    //partial class MainWindow
+    //{
+    //    public void GenerateMap(int height, int width, Brush color, int space = 50, int thickness = 30, float dist = 0.2f, int splitChance = 4)
+    //    {
+    //        // Initialize map
+    //        Map = new Unit[height, width];
+    //        for (int i = 0; i < Map.GetLength(0); i++)
+    //            for (int j = 0; j < Map.GetLength(1); j++)
+    //                Map[i, j] = new Unit();
 
-            // Start node
-            Node startNode = new Node(true, true, true, true, width / 2, height / 2);
+    //        // Start node
+    //        Node startNode = new Node(true, true, true, true, width / 2, height / 2);
 
-            // Build map
-            int aveDist = (int)((height + width) / 2 * dist);
-            BuildMap(startNode, map, splitChance, aveDist);
+    //        // Build Map
+    //        int aveDist = (int)((height + width) / 2 * dist);
+    //        BuildMap(startNode, Map, splitChance, aveDist);
 
-            // Draw map
-            bool[,] lookUp = new bool[height, width];
-            lookUp.Initialize();
-            DrawMap(startNode, lookUp, 40, 25, Brushes.Gray);
-        }
-    }
+    //        // Draw Map
+    //        bool[,] lookUp = new bool[height, width];
+    //        lookUp.Initialize();
+    //        DrawMap(startNode, lookUp, 40, 25, Brushes.Gray);
+    //    }
+    //}
 }

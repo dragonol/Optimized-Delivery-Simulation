@@ -23,12 +23,27 @@ namespace Optimized_Delivery_Simulation
         public static readonly Random random = new Random();
         public static (int height, int width) MapSize = (10, 20);
         public static Unit[,] Map;
-        public static TreePath[] LookupDistance;
+        public static Dictionary<Point,Path> LookupPath;
 
         public MainWindow()
         {
             InitializeComponent();
-            GenerateMap(Map, 15, 30, Brushes.SlateGray);
+            GenerateMap(10, 20, 0, 3);
+
+            //GenerateMap(15, 30, Brushes.SlateGray);
+            //Position[] positions = new Position[3];
+            //for(int i = 0; i < 3; i++)
+            //{
+            //    int y = random.Next(0, 14);
+            //    int x = random.Next(0, 29);
+            //    while(!Map[y,x].Status)
+            //    {
+            //        y = random.Next(0, 14);
+            //        x = random.Next(0, 29);
+            //    }
+            //    positions[i] = new Position(y, x);
+            //}
+            //CreateLookupDistance(positions);
         }
     }
 }
