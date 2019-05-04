@@ -29,22 +29,7 @@ namespace Optimized_Delivery_Simulation
         public MainWindow()
         {
             InitializeComponent();
-            GenerateMap(1, 3, 10, 4, Brushes.Coral);
-
-            //GenerateMap(15, 30, Brushes.SlateGray);
-            //Position[] positions = new Position[3];
-            //for(int i = 0; i < 3; i++)
-            //{
-            //    int y = random.Next(0, 14);
-            //    int x = random.Next(0, 29);
-            //    while(!Map[y,x].Status)
-            //    {
-            //        y = random.Next(0, 14);
-            //        x = random.Next(0, 29);
-            //    }
-            //    positions[i] = new Position(y, x);
-            //}
-            //CreateLookupDistance(positions);
+            GenerateMap(3, 0.25, 70, 30, Brushes.Coral);
         }
     }
 }

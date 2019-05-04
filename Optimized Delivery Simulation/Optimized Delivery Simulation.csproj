@@ -66,11 +66,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BuildMap.cs" />
+    <Compile Include="GenerateMap.cs" />
     <Compile Include="ComponentsClass.cs" />
     <Compile Include="CreateLookupDistance.cs" />
-    <Compile Include="DrawMap.cs" />
-    <Compile Include="GenerateMap.cs" />
+    <Compile Include="DrawPath.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
