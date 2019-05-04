@@ -81,6 +81,7 @@ namespace Optimized_Delivery_Simulation
                 int y = (int)routeUnit.Point.Y;
                 NodeUnit node1;
                 NodeUnit node2;
+                NodeUnit newNode;
 
                 if (routeUnit.Axis == Axis.Horizonal)
                 {
@@ -89,7 +90,7 @@ namespace Optimized_Delivery_Simulation
                     while ((node2 = (Map[y, x - run2] as NodeUnit)) == null)
                         run2++;
 
-                    NodeUnit newNode = new NodeUnit(y, x);
+                    newNode = new NodeUnit(y, x);
 
                     Connect(newNode, node1, Direction.Left, Direction.Right, run1);
                     Connect(newNode, node2, Direction.Right, Direction.Left, run2);
@@ -101,11 +102,12 @@ namespace Optimized_Delivery_Simulation
                     while ((node2 = (Map[y - run2, x] as NodeUnit)) == null)
                         run2++;
 
-                    NodeUnit newNode = new NodeUnit(y, x);
+                    newNode = new NodeUnit(y, x);
 
                     Connect(newNode, node1, Direction.Up, Direction.Down, run1);
                     Connect(newNode, node2, Direction.Down, Direction.Up, run2);
                 }
+                Map[y, x] = newNode;
             }
         }
 
