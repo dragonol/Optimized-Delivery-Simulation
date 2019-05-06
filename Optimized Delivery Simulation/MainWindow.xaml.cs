@@ -21,39 +21,41 @@ namespace Optimized_Delivery_Simulation
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static readonly Random random = new Random();
-        public static (int height, int width) MapSize = (10, 20);
+        public static readonly Random Random = new Random();
+        public static readonly (int height, int width) MapSize = (10, 20);
+        public static readonly int Space = 50;
+        public static readonly int SplitChance = 5;
+        public static readonly double AverageDistance = 0.3;
+        public static readonly int Thickness = 30;
 
-        public static WorldMap Map;
-        public static Dictionary<Point, Dictionary<Point, Trail>> LookupPath;
+        public static WorldMap Map = new WorldMap(MapSize.height,MapSize.width);
+        public static Dictionary<Point, Dictionary<Point, Trail>> LookupPath = new Dictionary<Point, Dictionary<Point, Trail>>();
+        public static List<Point> points = new List<Point>();
 
         public MainWindow()
         {
             InitializeComponent();
-
-            int splitChance = 5;
-            double averageDistance = 0.3;
-            int space = 70;
-            int thickness = 40;
             GenerateMap(splitChance, averageDistance, space, thickness, Brushes.Coral);
-            Point[] points = new Point[4];
-            for (int i = 0; i < 4; i++)
-            {
-                int x, y;
-                do
-                {
-                    x = random.Next(0, MapSize.width - 1);
-                    y = random.Next(0, MapSize.height - 1);
-                } while (Map[y, x] == null);
-                points[i] = Map[y, x].Point;
-            }
-            CreateLookupDistances(points);
+        }
 
-            Point run = points[0];
-            while(run!=points[1])
+        private void Grid_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var rawPoint = Mouse.GetPosition(Grid);
+            Point currMousePos = new Point((int)((rawPoint.Y + space / 2) / space), (int)((rawPoint.X + space / 2) / space));
+            
+            points.Add(Map[currMousePos].Point);
+            DrawNode(currMousePos, Brushes.Blue, space, 15);
+
+            if (points.Count == 2) 
             {
-                DrawPath(Map[run], Map[LookupPath[points[1]][run].Previous], Brushes.Blue, space, 20);
-                run = LookupPath[points[1]][run].Previous;
+                CreateLookupDistances(points);
+                Point run = points[0];
+                while (run != points[1]) 
+                {
+                    DrawPath(run, LookupPath[points[1]][run].Previous, Brushes.Blue, space, 15);
+                    run = LookupPath[points[1]][run].Previous;
+                }
+                points.Clear();
             }
         }
     }

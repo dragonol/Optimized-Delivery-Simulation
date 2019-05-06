@@ -9,7 +9,7 @@ namespace Optimized_Delivery_Simulation
 {
     partial class MainWindow
     {
-        public void CreateLookupDistances(Point[] depots)
+        public void CreateLookupDistances(List<Point> depots)
         {
             // Initialize LookupPath
             LookupPath = new Dictionary<Point, Dictionary<Point, Trail>>();
