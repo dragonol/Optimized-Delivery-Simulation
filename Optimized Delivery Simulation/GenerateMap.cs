@@ -21,7 +21,7 @@ namespace Optimized_Delivery_Simulation
         {
             int height = MapSize.height;
             int width = MapSize.width;
-            Map = new Unit[height, width];
+            Map = new WorldMap(height, width);
 
             NodeUnit start = new NodeUnit(random.Next(0, height - 1), random.Next(0, width - 1));
             BuildMap(start);
@@ -33,11 +33,12 @@ namespace Optimized_Delivery_Simulation
                 int[] lim = new int[4];
 
                 Map[y, x] = nodeUnit;
-                
-                lim[Direction.Left] = Math.Max(0, x - random.Next((int)(averageDistance * (width + height) / 2), (int)(averageDistance * (width + height))));
-                lim[Direction.Up] = Math.Max(0, y - random.Next((int)(averageDistance * (width + height) / 2), (int)(averageDistance * (width + height))));
-                lim[Direction.Right] = Math.Min(width - 1, x + random.Next((int)(averageDistance * (width + height) / 2), (int)(averageDistance * (width + height))));
-                lim[Direction.Down] = Math.Min(height - 1, y + random.Next((int)(averageDistance * (width + height) / 2), (int)(averageDistance * (width + height))));
+
+                double distance = averageDistance * (width + height) / 2;
+                lim[Direction.Left] = Math.Max(0, x - random.Next((int)distance, (int)(distance * 1.5)));
+                lim[Direction.Up] = Math.Max(0, y - random.Next((int)distance, (int)(distance * 1.5)));
+                lim[Direction.Right] = Math.Min(width - 1, x + random.Next((int)distance, (int)(distance * 1.5)));
+                lim[Direction.Down] = Math.Min(height - 1, y + random.Next((int)distance, (int)(distance * 1.5)));
 
                 NodeUnit result;
                 if (Process(nodeUnit, lim, Direction.Left, out result))

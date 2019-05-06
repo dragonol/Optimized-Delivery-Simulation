@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Priority_Queue;
 
 namespace Optimized_Delivery_Simulation
 {
@@ -33,6 +34,28 @@ namespace Optimized_Delivery_Simulation
             public static int Right = 2;
             public static int Down = 3;
         }
+        public class WorldMap
+        {
+            private Unit[,] units;
+            private List<NodeUnit> nodes;
+            private readonly int height;
+            private readonly int width;
+
+            public Unit[,] Units { get => units; set => units = value; }
+            public Unit this[int y, int x] { get => units[y, x]; set => units[y, x] = value; }
+            public Unit this[Point point] { get => units[point.Y, point.X]; set => units[point.Y, point.X] = value; }
+            public List<NodeUnit> Nodes { get => nodes; set => nodes = value; }
+            public int Height => height;
+            public int Width => width;
+
+            public WorldMap(int height, int width)
+            {
+                this.height = height;
+                this.width = width;
+                units = new Unit[height, width];
+                nodes = new List<NodeUnit>();
+            }
+        }
         public class Unit
         {
             private Point point;
@@ -40,8 +63,15 @@ namespace Optimized_Delivery_Simulation
             public Point Point { get => point; set => point = value; }
             public Unit(int y, int x)
             {
-                point.X = x;
-                point.Y = y;
+                point = new Point(y, x);
+            }
+            public Unit(Point point)
+            {
+                Point = point;
+            }
+            public static int Distance(Unit unit1, Unit unit2)
+            {
+                return Math.Abs(unit1.Point.X - unit2.Point.X) + Math.Abs(unit1.Point.Y - unit2.Point.Y);
             }
         }
         public class RouteUnit : Unit
@@ -65,6 +95,13 @@ namespace Optimized_Delivery_Simulation
             {
                 adjacentNodes = new NodeUnit[4];
                 adjacentDistances = new int[4];
+                Map.Nodes.Add(this);
+            }
+            public NodeUnit(Point point) : base(point)
+            {
+                adjacentNodes = new NodeUnit[4];
+                adjacentDistances = new int[4];
+                Map.Nodes.Add(this);
             }
             public static void Connect(NodeUnit node1, NodeUnit node2, int dirNode1, int dirNode2, int distance)
             {
@@ -90,7 +127,7 @@ namespace Optimized_Delivery_Simulation
                     while ((node2 = (Map[y, x - run2] as NodeUnit)) == null)
                         run2++;
 
-                    newNode = new NodeUnit(y, x);
+                    newNode = new NodeUnit(routeUnit.Point);
 
                     Connect(newNode, node1, Direction.Left, Direction.Right, run1);
                     Connect(newNode, node2, Direction.Right, Direction.Left, run2);
@@ -102,7 +139,7 @@ namespace Optimized_Delivery_Simulation
                     while ((node2 = (Map[y - run2, x] as NodeUnit)) == null)
                         run2++;
 
-                    newNode = new NodeUnit(y, x);
+                    newNode = new NodeUnit(routeUnit.Point);
 
                     Connect(newNode, node1, Direction.Up, Direction.Down, run1);
                     Connect(newNode, node2, Direction.Down, Direction.Up, run2);
@@ -111,21 +148,21 @@ namespace Optimized_Delivery_Simulation
             }
         }
 
-        public class Path
+        public class Trail
         {
-            Dictionary<Point, Point> previous;
-            Dictionary<Point, int> distance;
+            private Point previous;
+            private int distance;
 
-            public Dictionary<Point, Point> Previous { get => previous; set => previous = value; }
-            public Dictionary<Point, int> Distance { get => distance; set => distance = value; }
-            public Path()
+            public Point Previous { get => previous; set => previous = value; }
+            public int Distance { get => distance; set => distance = value; }
+            public Trail(Point previous, int distance)
             {
-                previous = new Dictionary<Point, Point>();
-                distance = new Dictionary<Point, int>();
+                Previous = previous;
+                Distance = distance;
             }
         }
 
-        public class Coordinate
+        public class Point : FastPriorityQueueNode, IEquatable<Point>
         {
             private int x;
             private int y;
@@ -133,10 +170,22 @@ namespace Optimized_Delivery_Simulation
             public int X { get => x; set => x = value; }
             public int Y { get => y; set => y = value; }
 
-            public Coordinate(int y, int x)
+            public Point(int y, int x)
             {
-                X = x;
-                Y = y;
+                this.x = x;
+                this.y = y;
+            }
+            public static bool operator==(Point a, Point b)
+            {
+                return a.x == b.x && a.y == b.y;
+            }
+            public static bool operator !=(Point a, Point b)
+            {
+                return a.x != b.x || a.y != b.y;
+            }
+            public bool Equals(Point other)
+            {
+                return this == other;
             }
         }
     }
