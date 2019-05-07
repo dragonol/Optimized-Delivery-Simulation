@@ -35,28 +35,32 @@ namespace Optimized_Delivery_Simulation
         public MainWindow()
         {
             InitializeComponent();
-            GenerateMap(splitChance, averageDistance, space, thickness, Brushes.Coral);
+            GenerateMap(Brushes.Coral);
         }
 
         private void Grid_MouseUp(object sender, MouseButtonEventArgs e)
         {
             var rawPoint = Mouse.GetPosition(Grid);
-            Point currMousePos = new Point((int)((rawPoint.Y + space / 2) / space), (int)((rawPoint.X + space / 2) / space));
-            
-            points.Add(Map[currMousePos].Point);
-            DrawNode(currMousePos, Brushes.Blue, space, 15);
+            Point currMousePos = new Point((int)((rawPoint.Y + Space / 2) / Space), (int)((rawPoint.X + Space / 2) / Space));
 
-            if (points.Count == 2) 
-            {
-                CreateLookupDistances(points);
-                Point run = points[0];
-                while (run != points[1]) 
-                {
-                    DrawPath(run, LookupPath[points[1]][run].Previous, Brushes.Blue, space, 15);
-                    run = LookupPath[points[1]][run].Previous;
-                }
-                points.Clear();
-            }
+            //points.Add(Map[currMousePos].Point);
+            //DrawNode(currMousePos, Brushes.Blue, Thickness/2);
+
+            //if (points.Count == 2) 
+            //{
+            //    CreateLookupDistances(points);
+            //    Point run = points[1];
+
+            //    while (run != points[0]) 
+            //    {
+            //        DrawPath(run, LookupPath[points[0]][run].Previous, Brushes.Blue, Thickness/2);
+            //        run = LookupPath[points[0]][run].Previous;
+            //    }
+            //    points.Clear();
+            //}
+
+            points.Add(Map[currMousePos].Point);
+            CreateLookupDistances(points);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Optimized_Delivery_Simulation
 {
     partial class MainWindow
     {
-        public void GenerateMap(int splitChance, double averageDistance, int space, int thickness, Brush color)
+        public void GenerateMap(Brush color)
         {
             int height = MapSize.height;
             int width = MapSize.width;
@@ -34,7 +34,7 @@ namespace Optimized_Delivery_Simulation
 
                 Map[y, x] = nodeUnit;
 
-                double distance = averageDistance * (width + height) / 2;
+                double distance = AverageDistance * (width + height) / 2;
                 lim[Direction.Left] = Math.Max(0, x - Random.Next((int)distance, (int)(distance * 1.5)));
                 lim[Direction.Up] = Math.Max(0, y - Random.Next((int)distance, (int)(distance * 1.5)));
                 lim[Direction.Right] = Math.Min(width - 1, x + Random.Next((int)distance, (int)(distance * 1.5)));
@@ -62,7 +62,7 @@ namespace Optimized_Delivery_Simulation
                     return false;
                 if (direction == 3 && nodeUnit.Point.Y == height - 1)
                     return false;
-                if (nodeUnit.AdjacentNodes[direction] != null || Random.Next(0, splitChance) == 0)
+                if (nodeUnit.AdjacentNodes[direction] != null || Random.Next(0, SplitChance) == 0)
                     return false;
 
                 unsafe
@@ -93,14 +93,15 @@ namespace Optimized_Delivery_Simulation
                         if ((curr as NodeUnit) != null)
                         {
                             NodeUnit.Connect((NodeUnit)curr, nodeUnit, direction, (direction + 2) % 4, i);
-                            DrawPath(nodeUnit.Point, curr.Point, color, space, thickness);
+                            DrawPath(nodeUnit.Point, curr.Point, color, Thickness);
                             return false;
                         }
 
                         if ((curr as RouteUnit) != null)
                         {
                             NodeUnit.CreateNode((RouteUnit)curr);
-                            DrawPath(nodeUnit.Point, curr.Point, color, space, thickness);
+                            NodeUnit.Connect((NodeUnit)Map[curr.Point], nodeUnit, direction, (direction + 2) % 4, i);
+                            DrawPath(nodeUnit.Point, curr.Point, color, Thickness);
                             return false;
                         }
 
@@ -114,7 +115,7 @@ namespace Optimized_Delivery_Simulation
                         new NodeUnit(y + *m * (direction / 2 * 2 - 1), x + *n * (direction / 2 * 2 - 1));
 
                     NodeUnit.Connect((NodeUnit)curr, nodeUnit, direction, (direction + 2) % 4, i);
-                    DrawPath(nodeUnit.Point, curr.Point, color, space, thickness);
+                    DrawPath(nodeUnit.Point, curr.Point, color, Thickness);
                     
                     result = (NodeUnit)curr;
                     return true;
