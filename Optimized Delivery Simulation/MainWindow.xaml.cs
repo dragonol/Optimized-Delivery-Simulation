@@ -30,7 +30,8 @@ namespace Optimized_Delivery_Simulation
 
         public static WorldMap Map = new WorldMap(MapSize.height,MapSize.width);
         public static Dictionary<Point, Dictionary<Point, Trail>> LookupPath = new Dictionary<Point, Dictionary<Point, Trail>>();
-        public static List<Point> points = new List<Point>();
+        public static LinkedList<Point> OptimizedRoute = new LinkedList<Point>();
+        public static Point Start;
 
         public MainWindow()
         {
@@ -59,8 +60,7 @@ namespace Optimized_Delivery_Simulation
             //    points.Clear();
             //}
 
-            points.Add(currMousePos);
-            CreateLookupDistances(points);
+            CreateLookupDistances(currMousePos);
 
             foreach (var node in Map.Nodes)
             {
