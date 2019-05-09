@@ -30,7 +30,7 @@ namespace Optimized_Delivery_Simulation
 
         public static WorldMap Map = new WorldMap(MapSize.height,MapSize.width);
         public static Dictionary<Point, Dictionary<Point, Trail>> LookupPath = new Dictionary<Point, Dictionary<Point, Trail>>();
-        public static Route OptimizedRoute = new Route();
+        public static List<Point> OptimizedRoute = new List<Point>();
         public static Point Start;
         public static List<Point> Depots = new List<Point>();
 
@@ -52,9 +52,8 @@ namespace Optimized_Delivery_Simulation
             {
                 CreateLookupDistances(Depots);
                 CreateOptimizedRoute();
-                bool run = true;
-                for (var i = OptimizedRoute.First; i != OptimizedRoute.Last; i = NextTo(i, ref run))
-                    DrawRoute(i.Point, GetNext(i, run).Point);
+                for (int i = 0; i < OptimizedRoute.Count; i++)
+                    DrawRoute(OptimizedRoute[i], OptimizedRoute[(i + 1) % OptimizedRoute.Count]);
             }
 
 

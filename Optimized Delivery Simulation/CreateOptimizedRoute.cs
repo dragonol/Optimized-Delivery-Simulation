@@ -11,44 +11,40 @@ namespace Optimized_Delivery_Simulation
         public void CreateOptimizedRoute()
         {
             int totalDistance = 0;
-            OptimizedRoute.AddLast(Start);
-            foreach (Point depot in Depots)
+            for(int i = 0; i < Depots.Count; i++)
             {
-                OptimizedRoute.AddLast(depot);
-                totalDistance += LookupPath[depot][OptimizedRoute.Last.Previous.Point].Distance;
+                OptimizedRoute.Add(Depots[i]);
+                totalDistance += LookupPath[Depots[i]][Depots[(i + 1) % Depots.Count]].Distance;
             }
-
+            
 
         Start:
 
-            bool dirNext1 = Traverse.Next;
-            for (var i = OptimizedRoute.First.Next; i != OptimizedRoute.Last; i = NextTo(i, ref dirNext1))
+            for(int i = 1; i < OptimizedRoute.Count - 1; i++)
             {
-                bool dirNext2 = dirNext1 ? true : false;
-                int distance_First_FirstPre = LookupPath[GetPrevious(i, dirNext1).Point][i.Point].Distance;
-                for (var j = NextTo(i, ref dirNext2); j != OptimizedRoute.Last; j = NextTo(j, ref dirNext2))
+                for(int j = i+1; j < OptimizedRoute.Count - 1; j++)
                 {
-                    int distance_First_SecondNext = LookupPath[GetNext(j, dirNext2).Point][i.Point].Distance;
-                    int distance_Second_SecondNext = LookupPath[GetNext(j, dirNext2).Point][j.Point].Distance;
-                    int distance_Second_FirstPre = LookupPath[GetPrevious(i, dirNext1).Point][j.Point].Distance;
-                    if (distance_First_FirstPre + distance_Second_SecondNext > distance_First_SecondNext + distance_Second_FirstPre)
+                    int distance_FirstPrevios_First = LookupPath[OptimizedRoute[i - 1]][OptimizedRoute[i]].Distance;
+                    int distance_SecondNext_Second = LookupPath[OptimizedRoute[j + 1]][OptimizedRoute[j]].Distance;
+                    int distance_FirstPrevios_Second = LookupPath[OptimizedRoute[i - 1]][OptimizedRoute[j]].Distance;
+                    int distance_SecondNext_First = LookupPath[OptimizedRoute[j + 1]][OptimizedRoute[i]].Distance;
+                    if (distance_FirstPrevios_First + distance_SecondNext_Second > distance_FirstPrevios_Second + distance_SecondNext_First)
                     {
-                        Two_OPT(i, j, dirNext1, dirNext2);
+                        Two_OPT(i, j);
                         goto Start;
                     }
                 }
             }
-
             
         }
-        public void Two_OPT(RouteNode first, RouteNode second, bool dir1, bool dir2)
+        public void Two_OPT(int i, int j)
         {
-            RouteNode firstPrevious = GetPrevious(first, dir1);
-            RouteNode secondNext = GetNext(second, dir2);
-
-            RouteNode temp = firstPrevious;
-            firstPrevious = secondNext;
-            secondNext = temp;
+            for(int k = i; k < (j-i+1)/2; k++)
+            {
+                Point temp = OptimizedRoute[k];
+                OptimizedRoute[k] = OptimizedRoute[j - k + i];
+                OptimizedRoute[j - k + i] = temp;
+            }
         }
 
         public RouteNode GetPrevious(RouteNode node, bool direction)
