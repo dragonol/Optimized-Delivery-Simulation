@@ -30,8 +30,9 @@ namespace Optimized_Delivery_Simulation
 
         public static WorldMap Map = new WorldMap(MapSize.height,MapSize.width);
         public static Dictionary<Point, Dictionary<Point, Trail>> LookupPath = new Dictionary<Point, Dictionary<Point, Trail>>();
-        public static LinkedList<Point> OptimizedRoute = new LinkedList<Point>();
+        public static Route OptimizedRoute = new Route();
         public static Point Start;
+        public static List<Point> Depots = new List<Point>();
 
         public MainWindow()
         {
@@ -44,35 +45,31 @@ namespace Optimized_Delivery_Simulation
             var rawPoint = Mouse.GetPosition(Grid);
             Point currMousePos = Map[new Point((int)((rawPoint.Y + Space / 2) / Space), (int)((rawPoint.X + Space / 2) / Space))].Point;
 
-            //points.Add(Map[currMousePos].Point);
-            //DrawNode(currMousePos, Brushes.Blue, Thickness / 2);
-
-            //if (points.Count == 2)
-            //{
-            //    CreateLookupDistances(points);
-            //    Point run = points[1];
-
-            //    while (run != points[0])
-            //    {
-            //        DrawPath(run, LookupPath[points[0]][run].Previous, Brushes.Blue, Thickness / 2);
-            //        run = LookupPath[points[0]][run].Previous;
-            //    }
-            //    points.Clear();
-            //}
 
             CreateLookupDistances(currMousePos);
+            Depots.Add(currMousePos);
+            DrawNode(currMousePos, Brushes.Blue, Thickness / 2);
 
-            foreach (var node in Map.Nodes)
+            if(Depots.Count==3)
             {
-                Point run = node.Point;
-
-                while (run != currMousePos)
-                {
-                    Point pre = LookupPath[currMousePos][run].Previous;
-                    DrawPath(run, pre, Brushes.Blue, Thickness / 2);
-                    run = pre;
-                }
+                CreateOptimizedRoute();
+                bool run = true;
+                for (var i = OptimizedRoute.First; i != OptimizedRoute.Last; i = NextTo(i, ref run))
+                    DrawRoute(i.Point, GetNext(i, run).Point);
             }
+
+
+            //foreach (var node in Map.Nodes)
+            //{
+            //    Point run = node.Point;
+
+            //    while (run != currMousePos)
+            //    {
+            //        Point pre = LookupPath[currMousePos][run].Previous;
+            //        DrawPath(run, pre, Brushes.Blue, Thickness / 2);
+            //        run = pre;
+            //    }
+            //}
 
         }
     }

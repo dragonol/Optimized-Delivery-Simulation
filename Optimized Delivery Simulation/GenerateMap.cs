@@ -24,6 +24,7 @@ namespace Optimized_Delivery_Simulation
             Map = new WorldMap(height, width);
 
             NodeUnit start = new NodeUnit(Random.Next(0, height - 1), Random.Next(0, width - 1));
+            Start = start.Point;
             BuildMap(start);
 
             void BuildMap(NodeUnit nodeUnit)

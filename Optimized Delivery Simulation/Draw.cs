@@ -48,5 +48,15 @@ namespace Optimized_Delivery_Simulation
 
             Grid.Children.Add(rectangle);
         }
+        public void DrawRoute(Point point1, Point point2)
+        {
+            Point run = point1;
+
+            while (run != point2)
+            {
+                DrawPath(run, LookupPath[point1][run].Previous, Brushes.Blue, Thickness / 2);
+                run = LookupPath[point1][run].Previous;
+            }
+        }
     }
 }

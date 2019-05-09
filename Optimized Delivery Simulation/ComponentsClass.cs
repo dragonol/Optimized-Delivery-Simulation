@@ -34,6 +34,11 @@ namespace Optimized_Delivery_Simulation
             public static int Right = 2;
             public static int Down = 3;
         }
+        public static class Traverse
+        {
+            public static bool Next = true;
+            public static bool Previous = false;
+        }
         public class WorldMap
         {
             private Unit[,] units;
@@ -162,6 +167,45 @@ namespace Optimized_Delivery_Simulation
             }
         }
 
+        public class RouteNode
+        {
+            private Point point;
+            private RouteNode next;
+            private RouteNode previous;
+
+            public Point Point { get => point; set => point = value; }
+            public RouteNode Next { get => next; set => next = value; }
+            public RouteNode Previous { get => previous; set => previous = value; }
+            public RouteNode(Point point, RouteNode next, RouteNode pre)
+            {
+                Point = point;
+                Next = next;
+                Previous = pre;
+            }
+        }
+
+        public class Route
+        {
+            private RouteNode first;
+            private RouteNode last;
+            private int count;
+
+            public RouteNode First { get => first; set => first = value; }
+            public RouteNode Last { get => last; set => last = value; }
+            public int Count { get => count; set => count = value; }
+
+            public void AddLast(Point point)
+            {
+                count++;
+                if (last == null)
+                {
+                    first = last = new RouteNode(point, null, null);
+                    return;
+                }
+                last.Next = new RouteNode(point, null, last);
+                last = last.Next;
+            }
+        }
         public class Point : FastPriorityQueueNode, IEquatable<Point>
         {
             private int x;

@@ -10,10 +10,7 @@ namespace Optimized_Delivery_Simulation
     partial class MainWindow
     {
         public void CreateLookupDistances(Point sourcePos)
-        {
-            // Initialize LookupPath
-            LookupPath = new Dictionary<Point, Dictionary<Point, Trail>>();
-
+        { 
             // Create nodes at depot position if its position is not a node
 
             if ((Map[sourcePos.Y, sourcePos.X] as RouteUnit) != null)
