@@ -54,8 +54,8 @@ namespace Optimized_Delivery_Simulation
 
             while (run != point2)
             {
-                DrawPath(run, LookupPath[point1][run].Previous, Brushes.Blue, Thickness / 2);
-                run = LookupPath[point1][run].Previous;
+                DrawPath(run, LookupPath[point2][run].Previous, Brushes.Blue, Thickness / 2);
+                run = LookupPath[point2][run].Previous;
             }
         }
     }

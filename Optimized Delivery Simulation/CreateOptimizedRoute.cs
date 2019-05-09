@@ -10,7 +10,6 @@ namespace Optimized_Delivery_Simulation
     {
         public void CreateOptimizedRoute()
         {
-            CreateLookupDistances(Start);
             int totalDistance = 0;
             OptimizedRoute.AddLast(Start);
             foreach (Point depot in Depots)

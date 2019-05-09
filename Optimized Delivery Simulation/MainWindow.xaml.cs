@@ -44,14 +44,13 @@ namespace Optimized_Delivery_Simulation
         {
             var rawPoint = Mouse.GetPosition(Grid);
             Point currMousePos = Map[new Point((int)((rawPoint.Y + Space / 2) / Space), (int)((rawPoint.X + Space / 2) / Space))].Point;
-
-
-            CreateLookupDistances(currMousePos);
+            
             Depots.Add(currMousePos);
             DrawNode(currMousePos, Brushes.Blue, Thickness / 2);
 
-            if(Depots.Count==3)
+            if(Depots.Count==5)
             {
+                CreateLookupDistances(Depots);
                 CreateOptimizedRoute();
                 bool run = true;
                 for (var i = OptimizedRoute.First; i != OptimizedRoute.Last; i = NextTo(i, ref run))

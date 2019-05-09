@@ -9,50 +9,53 @@ namespace Optimized_Delivery_Simulation
 {
     partial class MainWindow
     {
-        public void CreateLookupDistances(Point sourcePos)
-        { 
+        public void CreateLookupDistances(List<Point> listSourcePos)
+        {
             // Create nodes at depot position if its position is not a node
-
-            if ((Map[sourcePos.Y, sourcePos.X] as RouteUnit) != null)
-                NodeUnit.CreateNode((RouteUnit)Map[sourcePos.Y, sourcePos.X]);
+            foreach (Point sourcePos in listSourcePos)
+            {
+                if ((Map[sourcePos.Y, sourcePos.X] as RouteUnit) != null)
+                    NodeUnit.CreateNode((RouteUnit)Map[sourcePos.Y, sourcePos.X]);
+            }
 
 
             // Create LookupPath
-
-            Dictionary<Point, Trail> sourcePath = LookupPath[sourcePos] = new Dictionary<Point, Trail>();
-            FastPriorityQueue<Point> set = new FastPriorityQueue<Point>(Map.Nodes.Count);
-
-            foreach (NodeUnit depot in Map.Nodes)
+            foreach (Point sourcePos in listSourcePos)
             {
-                Point depotPos = depot.Point;
-                sourcePath[depotPos] = new Trail(null, int.MaxValue);
-                set.Enqueue(depotPos, sourcePath[depotPos].Distance);
-            }
+                Dictionary<Point, Trail> sourcePath = LookupPath[sourcePos] = new Dictionary<Point, Trail>();
+                FastPriorityQueue<Point> set = new FastPriorityQueue<Point>(Map.Nodes.Count);
 
-            sourcePath[sourcePos].Distance = 0;
-            set.UpdatePriority(sourcePos, 0);
-
-            while (set.Count > 0)
-            {
-                Point curr = set.Dequeue();
-                int currDistance = sourcePath[curr].Distance;
-
-                foreach (NodeUnit node in ((NodeUnit)Map[curr.Y, curr.X]).AdjacentNodes)
+                foreach (NodeUnit depot in Map.Nodes)
                 {
-                    if (node == null)
-                        continue;
+                    Point depotPos = depot.Point;
+                    sourcePath[depotPos] = new Trail(null, int.MaxValue);
+                    set.Enqueue(depotPos, sourcePath[depotPos].Distance);
+                }
 
-                    int alt = currDistance + Unit.Distance(node, Map[curr.Y, curr.X]);
+                sourcePath[sourcePos].Distance = 0;
+                set.UpdatePriority(sourcePos, 0);
 
-                    if (alt < sourcePath[node.Point].Distance)
+                while (set.Count > 0)
+                {
+                    Point curr = set.Dequeue();
+                    int currDistance = sourcePath[curr].Distance;
+
+                    foreach (NodeUnit node in ((NodeUnit)Map[curr.Y, curr.X]).AdjacentNodes)
                     {
-                        sourcePath[node.Point].Distance = alt;
-                        sourcePath[node.Point].Previous = curr;
-                        set.UpdatePriority(node.Point, alt);
+                        if (node == null)
+                            continue;
+
+                        int alt = currDistance + Unit.Distance(node, Map[curr.Y, curr.X]);
+
+                        if (alt < sourcePath[node.Point].Distance)
+                        {
+                            sourcePath[node.Point].Distance = alt;
+                            sourcePath[node.Point].Previous = curr;
+                            set.UpdatePriority(node.Point, alt);
+                        }
                     }
                 }
             }
-
         }
     }
 }
