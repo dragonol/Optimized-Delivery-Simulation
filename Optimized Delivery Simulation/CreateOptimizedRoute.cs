@@ -11,14 +11,17 @@ namespace Optimized_Delivery_Simulation
         public void CreateOptimizedRoute()
         {
             int totalDistance = 0;
+            int nodeCount = OptimizedRoute.Count;
+            int temperature = 50;
+
             for (int i = 0; i < Depots.Count; i++)
             {
                 OptimizedRoute.Add(Depots[i]);
                 totalDistance += LookupPath[Depots[i]][Depots[(i + 1) % Depots.Count]].Distance;
             }
             
-            int nodeCount = OptimizedRoute.Count;
         Start:
+
             for (int i = 1; i < nodeCount; i++)
             {
                 for (int j = i + 1; j < nodeCount; j++)
@@ -27,55 +30,26 @@ namespace Optimized_Delivery_Simulation
                     int distance_SecondNext_Second = LookupPath[OptimizedRoute[(j + 1) % nodeCount]][OptimizedRoute[j]].Distance;
                     int distance_FirstPrevios_Second = LookupPath[OptimizedRoute[i - 1]][OptimizedRoute[j]].Distance;
                     int distance_SecondNext_First = LookupPath[OptimizedRoute[(j + 1) % nodeCount]][OptimizedRoute[i]].Distance;
-                    if (distance_FirstPrevios_First + distance_SecondNext_Second > distance_FirstPrevios_Second + distance_SecondNext_First)
+                    if (distance_FirstPrevios_First + distance_SecondNext_Second > distance_FirstPrevios_Second + distance_SecondNext_First || 
+                        Random.Next(100) < temperature)
                     {
                         Two_OPT(i, j);
+                        temperature = Math.Max(temperature - 1, 0);
                         goto Start;
                     }
                 }
             }
 
-
-        }
-        public void Two_OPT(int i, int j)
-        {
-            int nodeCount = OptimizedRoute.Count;
-            for (int k = 0; k < (j-i+1)/2; k++)
+            void Two_OPT(int i, int j)
             {
-                Point temp = OptimizedRoute[(k + i) % nodeCount];
-                OptimizedRoute[(k + i) % nodeCount] = OptimizedRoute[j - k];
-                OptimizedRoute[j - k] = temp;
+                for (int k = 0; k < (j - i + 1) / 2; k++)
+                {
+                    Point temp = OptimizedRoute[(k + i) % nodeCount];
+                    OptimizedRoute[(k + i) % nodeCount] = OptimizedRoute[j - k];
+                    OptimizedRoute[j - k] = temp;
+                }
             }
         }
-
-        public RouteNode GetPrevious(RouteNode node, bool direction)
-        {
-            if (direction)
-                return node.Previous;
-            else
-                return node.Next;
-        }
-        public RouteNode GetNext(RouteNode node, bool direction)
-        {
-            if (!direction)
-                return node.Previous;
-            else
-                return node.Next;
-        }
-        public RouteNode NextTo(RouteNode node, ref bool direction)
-        {
-            if (direction)
-            {
-                if (node == node.Next.Next)
-                    direction = (!direction);
-                return node.Next;
-            }
-            else
-            {
-                if (node == node.Previous.Previous)
-                    direction = (!direction);
-                return node.Previous;
-            }
-        }
+        
     }
 }
