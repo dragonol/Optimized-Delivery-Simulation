@@ -38,6 +38,7 @@ namespace Optimized_Delivery_Simulation
         {
             InitializeComponent();
             GenerateMap(Brushes.Coral);
+            DrawNode(Start, Brushes.AntiqueWhite, Thickness / 2);
         }
 
         private void Grid_MouseUp(object sender, MouseButtonEventArgs e)
@@ -48,7 +49,7 @@ namespace Optimized_Delivery_Simulation
             Depots.Add(currMousePos);
             DrawNode(currMousePos, Brushes.Blue, Thickness / 2);
 
-            if(Depots.Count==5)
+            if(Depots.Count==15)
             {
                 CreateLookupDistances(Depots);
                 CreateOptimizedRoute();

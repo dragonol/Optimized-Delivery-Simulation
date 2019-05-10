@@ -11,23 +11,22 @@ namespace Optimized_Delivery_Simulation
         public void CreateOptimizedRoute()
         {
             int totalDistance = 0;
-            for(int i = 0; i < Depots.Count; i++)
+            for (int i = 0; i < Depots.Count; i++)
             {
                 OptimizedRoute.Add(Depots[i]);
                 totalDistance += LookupPath[Depots[i]][Depots[(i + 1) % Depots.Count]].Distance;
             }
             
-
+            int nodeCount = OptimizedRoute.Count;
         Start:
-
-            for(int i = 1; i < OptimizedRoute.Count - 1; i++)
+            for (int i = 1; i < nodeCount; i++)
             {
-                for(int j = i+1; j < OptimizedRoute.Count - 1; j++)
+                for (int j = i + 1; j < nodeCount; j++)
                 {
                     int distance_FirstPrevios_First = LookupPath[OptimizedRoute[i - 1]][OptimizedRoute[i]].Distance;
-                    int distance_SecondNext_Second = LookupPath[OptimizedRoute[j + 1]][OptimizedRoute[j]].Distance;
+                    int distance_SecondNext_Second = LookupPath[OptimizedRoute[(j + 1) % nodeCount]][OptimizedRoute[j]].Distance;
                     int distance_FirstPrevios_Second = LookupPath[OptimizedRoute[i - 1]][OptimizedRoute[j]].Distance;
-                    int distance_SecondNext_First = LookupPath[OptimizedRoute[j + 1]][OptimizedRoute[i]].Distance;
+                    int distance_SecondNext_First = LookupPath[OptimizedRoute[(j + 1) % nodeCount]][OptimizedRoute[i]].Distance;
                     if (distance_FirstPrevios_First + distance_SecondNext_Second > distance_FirstPrevios_Second + distance_SecondNext_First)
                     {
                         Two_OPT(i, j);
@@ -35,15 +34,17 @@ namespace Optimized_Delivery_Simulation
                     }
                 }
             }
-            
+
+
         }
         public void Two_OPT(int i, int j)
         {
-            for(int k = i; k < (j-i+1)/2; k++)
+            int nodeCount = OptimizedRoute.Count;
+            for (int k = 0; k < (j-i+1)/2; k++)
             {
-                Point temp = OptimizedRoute[k];
-                OptimizedRoute[k] = OptimizedRoute[j - k + i];
-                OptimizedRoute[j - k + i] = temp;
+                Point temp = OptimizedRoute[(k + i) % nodeCount];
+                OptimizedRoute[(k + i) % nodeCount] = OptimizedRoute[j - k];
+                OptimizedRoute[j - k] = temp;
             }
         }
 

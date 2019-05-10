@@ -25,7 +25,9 @@ namespace Optimized_Delivery_Simulation
 
             NodeUnit start = new NodeUnit(Random.Next(0, height - 1), Random.Next(0, width - 1));
             Start = start.Point;
+
             Depots.Add(Start);
+
             BuildMap(start);
 
             void BuildMap(NodeUnit nodeUnit)
