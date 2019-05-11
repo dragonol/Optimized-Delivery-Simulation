@@ -28,7 +28,7 @@ namespace Optimized_Delivery_Simulation
             line.HorizontalAlignment = HorizontalAlignment.Left;
             line.VerticalAlignment = VerticalAlignment.Top;
             line.StrokeThickness = thickness;
-            Grid.Children.Add(line);
+            MapSection.Children.Add(line);
 
             DrawNode(point1, color, thickness);
             DrawNode(point2, color, thickness);
@@ -46,7 +46,7 @@ namespace Optimized_Delivery_Simulation
             rectangle.HorizontalAlignment = HorizontalAlignment.Left;
             rectangle.Margin = new Thickness(point.X * Space - thickness / 2, point.Y * Space - thickness / 2, 0, 0);
 
-            Grid.Children.Add(rectangle);
+            MapSection.Children.Add(rectangle);
         }
         public void DrawRoute(Point point1, Point point2)
         {

@@ -37,12 +37,11 @@ namespace Optimized_Delivery_Simulation
                 int[] lim = new int[4];
 
                 Map[y, x] = nodeUnit;
-
-                double distance = AverageDistance * (width + height) / 2;
-                lim[Direction.Left] = Math.Max(0, x - Random.Next((int)distance, (int)(distance * 1.5)));
-                lim[Direction.Up] = Math.Max(0, y - Random.Next((int)distance, (int)(distance * 1.5)));
-                lim[Direction.Right] = Math.Min(width - 1, x + Random.Next((int)distance, (int)(distance * 1.5)));
-                lim[Direction.Down] = Math.Min(height - 1, y + Random.Next((int)distance, (int)(distance * 1.5)));
+                
+                lim[Direction.Left] = Math.Max(0, x - Random.Next((int)(AverageDistance * 0.5), (int)(AverageDistance * 1.5)));
+                lim[Direction.Up] = Math.Max(0, y - Random.Next((int)(AverageDistance * 0.5), (int)(AverageDistance * 1.5)));
+                lim[Direction.Right] = Math.Min(width - 1, x + Random.Next((int)(AverageDistance * 0.5), (int)(AverageDistance * 1.5)));
+                lim[Direction.Down] = Math.Min(height - 1, y + Random.Next((int)(AverageDistance * 0.5), (int)(AverageDistance * 1.5)));
 
                 NodeUnit result;
                 if (Process(nodeUnit, lim, Direction.Left, out result))

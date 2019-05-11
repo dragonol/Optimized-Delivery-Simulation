@@ -22,10 +22,10 @@ namespace Optimized_Delivery_Simulation
     public partial class MainWindow : Window
     {
         public static readonly Random Random = new Random();
-        public static readonly (int height, int width) MapSize = (15, 25);
+        public static readonly (int height, int width) MapSize = (30, 65);
         public static readonly int Space = 40;
         public static readonly int SplitChance = 5;
-        public static readonly double AverageDistance = 0.2;
+        public static readonly double AverageDistance = 6;
         public static readonly int Thickness = 30;
 
         public static WorldMap Map = new WorldMap(MapSize.height,MapSize.width);
@@ -34,22 +34,30 @@ namespace Optimized_Delivery_Simulation
         public static Point Start;
         public static List<Point> Depots = new List<Point>();
 
+        public static System.Windows.Point GridMargin = new System.Windows.Point(0, 0);
+        public static System.Windows.Point BasePosition;
+        public static System.Windows.Point CurrPosition;
+        public static bool IsDragging = false;
+
         public MainWindow()
         {
             InitializeComponent();
-            GenerateMap(Brushes.Coral);
+            GenerateMap(Brushes.PowderBlue);
             DrawNode(Start, Brushes.AntiqueWhite, Thickness / 2);
         }
 
-        private void Grid_MouseUp(object sender, MouseButtonEventArgs e)
+        private void MapSection_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            var rawPoint = Mouse.GetPosition(Grid);
-            Point currMousePos = Map[new Point((int)((rawPoint.Y + Space / 2) / Space), (int)((rawPoint.X + Space / 2) / Space))].Point;
-            
+            var rawPoint = Mouse.GetPosition(MapSection);
+            Point currMousePos = Map[(int)((rawPoint.Y + Space / 2) / Space), (int)((rawPoint.X + Space / 2) / Space)]?.Point;
+
+            if ((object)currMousePos==null) 
+                return;
+
             Depots.Add(currMousePos);
             DrawNode(currMousePos, Brushes.Blue, Thickness / 2);
 
-            if(Depots.Count==15)
+            if (Depots.Count == 15)
             {
                 CreateLookupDistances(Depots);
                 CreateOptimizedRoute();
@@ -57,11 +65,9 @@ namespace Optimized_Delivery_Simulation
                     DrawRoute(OptimizedRoute[i], OptimizedRoute[(i + 1) % OptimizedRoute.Count]);
             }
 
-
             //foreach (var node in Map.Nodes)
             //{
             //    Point run = node.Point;
-
             //    while (run != currMousePos)
             //    {
             //        Point pre = LookupPath[currMousePos][run].Previous;
@@ -69,7 +75,31 @@ namespace Optimized_Delivery_Simulation
             //        run = pre;
             //    }
             //}
+        }
 
+        private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            BasePosition = Mouse.GetPosition(MapSection);
+            IsDragging = true;
+            Console.WriteLine("click");
+        }
+
+        private void Window_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            IsDragging = false;
+            Console.WriteLine("release");
+        }
+
+        private void Window_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if(IsDragging)
+            {
+                Console.WriteLine("moving");
+                CurrPosition = Mouse.GetPosition(MapSection);
+                double absLeft = CurrPosition.X - BasePosition.X;
+                double absTop = CurrPosition.Y - BasePosition.Y;
+                MapSection.Margin = new Thickness(MapSection.Margin.Left + absLeft, MapSection.Margin.Top + absTop, 0, 0);
+            }
         }
     }
 }
