@@ -6,9 +6,10 @@
         xmlns:local="clr-namespace:Optimized_Delivery_Simulation"
         mc:Ignorable="d"
         VerticalAlignment="Center" HorizontalAlignment="Center" 
-        Title="MainWindow" WindowState="Maximized">
-    <Grid x:Name="Window" VerticalAlignment="Center" HorizontalAlignment="Center"  PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="Window_PreviewMouseLeftButtonUp" PreviewMouseMove="Window_PreviewMouseMove" >
-        <Grid x:Name="MapSection"  Background="Wheat" VerticalAlignment="Center" HorizontalAlignment="Center" PreviewMouseLeftButtonUp="MapSection_PreviewMouseLeftButtonUp" Grid.Row="1" />
-
+        Title="MainWindow" WindowState="Maximized" WindowStyle="None">
+    <Grid x:Name="Window" VerticalAlignment="Center" HorizontalAlignment="Center"  PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown" PreviewMouseMove="Window_PreviewMouseMove" MouseLeftButtonUp="Window_MouseLeftButtonUp" PreviewMouseWheel="Window_PreviewMouseWheel" >
+        <Grid x:Name="MapSectionCover" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" Height="10000" Width="10000">
+            <Grid x:Name="MapSection" Background="White" VerticalAlignment="Center" HorizontalAlignment="Center" PreviewMouseLeftButtonUp="MapSection_PreviewMouseLeftButtonUp" Grid.Row="1" />
+        </Grid>
     </Grid>
 </Window>

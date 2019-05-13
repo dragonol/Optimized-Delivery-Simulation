@@ -24,7 +24,7 @@ namespace Optimized_Delivery_Simulation
         public static readonly Random Random = new Random();
         public static readonly (int height, int width) MapSize = (30, 65);
         public static readonly int Space = 40;
-        public static readonly int SplitChance = 5;
+        public static readonly int SplitChance = 3;
         public static readonly double AverageDistance = 6;
         public static readonly int Thickness = 30;
 
@@ -38,6 +38,10 @@ namespace Optimized_Delivery_Simulation
         public static System.Windows.Point BasePosition;
         public static System.Windows.Point CurrPosition;
         public static bool IsDragging = false;
+        public static bool MouseLeftDown = false;
+
+        public static double MapScaleX = 1;
+        public static double MapScaleY = 1;
 
         public MainWindow()
         {
@@ -48,11 +52,19 @@ namespace Optimized_Delivery_Simulation
 
         private void MapSection_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            if (IsDragging)
+                return;
+
             var rawPoint = Mouse.GetPosition(MapSection);
             Point currMousePos = Map[(int)((rawPoint.Y + Space / 2) / Space), (int)((rawPoint.X + Space / 2) / Space)]?.Point;
 
             if ((object)currMousePos==null) 
                 return;
+
+            if (Depots.Contains(currMousePos))
+                return;
+
+            Console.WriteLine("add node");
 
             Depots.Add(currMousePos);
             DrawNode(currMousePos, Brushes.Blue, Thickness / 2);
@@ -80,26 +92,46 @@ namespace Optimized_Delivery_Simulation
         private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             BasePosition = Mouse.GetPosition(MapSection);
-            IsDragging = true;
+            MouseLeftDown = true;
             Console.WriteLine("click");
-        }
-
-        private void Window_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            IsDragging = false;
-            Console.WriteLine("release");
         }
 
         private void Window_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if(IsDragging)
+            if(MouseLeftDown)
             {
+                IsDragging = true;
                 Console.WriteLine("moving");
                 CurrPosition = Mouse.GetPosition(MapSection);
                 double absLeft = CurrPosition.X - BasePosition.X;
                 double absTop = CurrPosition.Y - BasePosition.Y;
                 MapSection.Margin = new Thickness(MapSection.Margin.Left + absLeft, MapSection.Margin.Top + absTop, 0, 0);
             }
+        }
+
+        private void Window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            IsDragging = false;
+            MouseLeftDown = false;
+            Console.WriteLine("release");
+        }
+
+        private void Window_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var currMousePos = Mouse.GetPosition(MapSection);
+            Console.WriteLine(currMousePos.X + " " + currMousePos.Y);
+            if (e.Delta < 0)
+            {
+                MapScaleX += 0.01;
+                MapScaleY += 0.01;
+            }
+            else
+            {
+                MapScaleX -= 0.01;
+                MapScaleY -= 0.01;
+            }
+            MapSection.LayoutTransform = 
+                new ScaleTransform(MapScaleX,MapScaleY,1000,1000);
         }
     }
 }
