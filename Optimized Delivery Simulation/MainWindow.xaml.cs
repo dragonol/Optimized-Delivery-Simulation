@@ -40,19 +40,18 @@ namespace Optimized_Delivery_Simulation
         public static bool IsDragging = false;
         public static bool MouseLeftDown = false;
 
-        public static double MapScaleX = 1;
-        public static double MapScaleY = 1;
+        public static double MapScale = 1;
 
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();                                
             GenerateMap(Brushes.PowderBlue);
             DrawNode(Start, Brushes.AntiqueWhite, Thickness / 2);
         }
 
         private void MapSection_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (IsDragging)
+            if (IsDragging && (Math.Abs(CurrPosition.X-BasePosition.X)+Math.Abs(CurrPosition.Y-BasePosition.Y))>0.2)
                 return;
 
             var rawPoint = Mouse.GetPosition(MapSection);
@@ -93,7 +92,7 @@ namespace Optimized_Delivery_Simulation
         {
             BasePosition = Mouse.GetPosition(MapSection);
             MouseLeftDown = true;
-            Console.WriteLine("click");
+            Console.WriteLine("click " + BasePosition.X + " " + BasePosition.Y);
         }
 
         private void Window_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -118,20 +117,14 @@ namespace Optimized_Delivery_Simulation
 
         private void Window_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            var currMousePos = Mouse.GetPosition(MapSection);
+            var currMousePos = Mouse.GetPosition(MapSectionCover);
             Console.WriteLine(currMousePos.X + " " + currMousePos.Y);
+            double scale = 0.03;
             if (e.Delta < 0)
-            {
-                MapScaleX += 0.01;
-                MapScaleY += 0.01;
-            }
-            else
-            {
-                MapScaleX -= 0.01;
-                MapScaleY -= 0.01;
-            }
-            MapSection.LayoutTransform = 
-                new ScaleTransform(MapScaleX,MapScaleY,1000,1000);
+                scale *= -1;
+            MapScale += scale;
+            MapSectionCover.LayoutTransform = 
+                new ScaleTransform(MapScale,MapScale,currMousePos.X,currMousePos.Y);
         }
     }
 }
