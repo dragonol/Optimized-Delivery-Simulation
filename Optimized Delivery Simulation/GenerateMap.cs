@@ -21,14 +21,15 @@ namespace Optimized_Delivery_Simulation
         {
             int height = MapSize.height;
             int width = MapSize.width;
-            Map = new WorldMap(height, width);
-
+            
             NodeUnit start = new NodeUnit(Random.Next(0, height - 1), Random.Next(0, width - 1));
             Start = start.Point;
 
             Depots.Add(Start);
 
             BuildMap(start);
+
+            Draw(MapComponents, MapSection, MapImage, Brushes.Blue, Thickness);
 
             void BuildMap(NodeUnit nodeUnit)
             {
@@ -96,7 +97,7 @@ namespace Optimized_Delivery_Simulation
                         if ((curr as NodeUnit) != null)
                         {
                             NodeUnit.Connect((NodeUnit)curr, nodeUnit, direction, (direction + 2) % 4, i);
-                            DrawPath(nodeUnit.Point, curr.Point, color, Thickness);
+                            AddDrawPath(nodeUnit.Point, curr.Point, MapComponents);
                             return false;
                         }
 
@@ -104,7 +105,7 @@ namespace Optimized_Delivery_Simulation
                         {
                             NodeUnit.CreateNode((RouteUnit)curr);
                             NodeUnit.Connect((NodeUnit)Map[curr.Point], nodeUnit, direction, (direction + 2) % 4, i);
-                            DrawPath(nodeUnit.Point, curr.Point, color, Thickness);
+                            AddDrawPath(nodeUnit.Point, curr.Point, MapComponents);
                             return false;
                         }
 
@@ -118,7 +119,7 @@ namespace Optimized_Delivery_Simulation
                         new NodeUnit(y + *m * (direction / 2 * 2 - 1), x + *n * (direction / 2 * 2 - 1));
 
                     NodeUnit.Connect((NodeUnit)curr, nodeUnit, direction, (direction + 2) % 4, i);
-                    DrawPath(nodeUnit.Point, curr.Point, color, Thickness);
+                    AddDrawPath(nodeUnit.Point, curr.Point, MapComponents);
                     
                     result = (NodeUnit)curr;
                     return true;

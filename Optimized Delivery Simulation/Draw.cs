@@ -17,46 +17,76 @@ namespace Optimized_Delivery_Simulation
 {
     partial class MainWindow
     {
-        public void DrawPath(Point point1, Point point2, Brush color, double thickness)
+        public void Draw(GeometryGroup geometries, UIElement element, Image image, Brush color, double thickness)
         {
-            Line line = new Line();
-            line.Stroke = color;
-            line.X1 = point1.X * Space;
-            line.X2 = point2.X * Space;
-            line.Y1 = point1.Y * Space;
-            line.Y2 = point2.Y * Space;
-            line.HorizontalAlignment = HorizontalAlignment.Left;
-            line.VerticalAlignment = VerticalAlignment.Top;
-            line.StrokeThickness = thickness;
-            MapSection.Children.Add(line);
+            GeometryDrawing geometryDrawing = new GeometryDrawing(
+                Brushes.Black,
+                new Pen(color, thickness), geometries);
 
-            DrawNode(point1, color, thickness);
-            DrawNode(point2, color, thickness);
+            DrawingImage drawingImage = new DrawingImage(geometryDrawing);
+            drawingImage.Freeze();
+
+            Console.WriteLine(geometryDrawing.IsFrozen);
+
+            image.Source = drawingImage;
+            image.Stretch = Stretch.None;
+            image.HorizontalAlignment = HorizontalAlignment.Center;
+            image.VerticalAlignment = VerticalAlignment.Center;
+            
+            Canvas.SetLeft(image, 0);
+            Canvas.SetTop(image, 0);
+
+            ((Canvas)element).Children.Add(image);
         }
-        public void DrawNode(Point point, Brush color, double thickness)
+        public void AddDrawPath(System.Windows.Point point1, System.Windows.Point point2, GeometryGroup geometries)
         {
-            Rectangle rectangle = new Rectangle();
-            rectangle.Stroke = color;
-            rectangle.RadiusX = 90;
-            rectangle.RadiusY = 90;
-            rectangle.Height = thickness;
-            rectangle.Width = thickness;
-            rectangle.StrokeThickness = thickness / 2;
-            rectangle.VerticalAlignment = VerticalAlignment.Top;
-            rectangle.HorizontalAlignment = HorizontalAlignment.Left;
-            rectangle.Margin = new Thickness(point.X * Space - thickness / 2, point.Y * Space - thickness / 2, 0, 0);
-
-            MapSection.Children.Add(rectangle);
+            LineGeometry line = new LineGeometry(
+                new System.Windows.Point(point1.X * Space, point1.Y * Space),
+                new System.Windows.Point(point2.X * Space, point2.Y * Space));
+            geometries.Children.Add(line);
+            
+            AddDrawNode(point1, geometries);
+            AddDrawNode(point2, geometries);
         }
-        public void DrawRoute(Point point1, Point point2)
+        public void AddDrawNode(System.Windows.Point point, GeometryGroup geometries)
+        {
+            RectangleGeometry rect = new RectangleGeometry(
+                new Rect(point.X * Space, point.Y * Space, 0, 0), 90, 90);
+            geometries.Children.Add(rect);
+        }
+        public void AddDrawRoute(Point point1, Point point2, GeometryGroup geometries)
         {
             Point run = point1;
 
             while (run != point2)
             {
-                DrawPath(run, LookupPath[point2][run].Previous, Brushes.Blue, Thickness / 2);
+                AddDrawPath(run, LookupPath[point2][run].Previous, geometries);
                 run = LookupPath[point2][run].Previous;
             }
         }
+        public void DrawSingleNode(System.Windows.Point point, UIElement element, Brush color, double thickness)
+        {
+            RectangleGeometry rect = new RectangleGeometry(
+                new Rect(0, 0, 0, 0), 90, 90);
+
+            GeometryDrawing geometryDrawing = new GeometryDrawing(
+                Brushes.Black,
+                new Pen(color, thickness), rect);
+            
+            DrawingImage drawingImage = new DrawingImage(geometryDrawing);
+            drawingImage.Freeze();
+
+            Image image = new Image();
+            image.Source = drawingImage;
+            image.Stretch = Stretch.None;
+            image.HorizontalAlignment = HorizontalAlignment.Center;
+            image.VerticalAlignment = VerticalAlignment.Center;
+
+            Canvas.SetLeft(image, point.X * Space + thickness/2);
+            Canvas.SetTop(image, point.Y * Space + thickness/2);
+
+            ((Canvas)element).Children.Add(image);
+        }
+        
     }
 }

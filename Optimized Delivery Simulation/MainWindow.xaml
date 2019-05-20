@@ -7,9 +7,10 @@
         mc:Ignorable="d"
         VerticalAlignment="Center" HorizontalAlignment="Center" 
         Title="MainWindow" WindowState="Maximized" >
-    <Grid x:Name="Window" VerticalAlignment="Center" HorizontalAlignment="Center"  PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown" PreviewMouseMove="Window_PreviewMouseMove" MouseLeftButtonUp="Window_MouseLeftButtonUp" PreviewMouseWheel="Window_PreviewMouseWheel" >
-        <Grid x:Name="MapSectionCover" Background="Red" HorizontalAlignment="Center" VerticalAlignment="Center" Height="10000" Width="10000">
-            <Grid x:Name="MapSection" Background="White" VerticalAlignment="Center" HorizontalAlignment="Center" PreviewMouseLeftButtonUp="MapSection_PreviewMouseLeftButtonUp" Grid.Row="1" />
-        </Grid>
+    <Grid x:Name="Window" >
+        <Canvas x:Name="MapSectionCover" Width="1920" Height="1080" HorizontalAlignment="Center" VerticalAlignment="Center" PreviewMouseLeftButtonDown="MapSectionCover_PreviewMouseLeftButtonDown" PreviewMouseMove="MapSectionCover_PreviewMouseMove" MouseLeftButtonUp="MapSectionCover_MouseLeftButtonUp" PreviewMouseLeftButtonUp="MapSectionCover_PreviewMouseLeftButtonUp" >
+            <Canvas x:Name="MapSection" VerticalAlignment="Center" HorizontalAlignment="Center" Canvas.Top="0" Canvas.Left="0"></Canvas>
+        </Canvas>
+        
     </Grid>
 </Window>

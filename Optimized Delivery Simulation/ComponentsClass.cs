@@ -49,6 +49,7 @@ namespace Optimized_Delivery_Simulation
             public Unit[,] Units { get => units; set => units = value; }
             public Unit this[int y, int x] { get => units[y, x]; set => units[y, x] = value; }
             public Unit this[Point point] { get => units[point.Y, point.X]; set => units[point.Y, point.X] = value; }
+            public Unit this[System.Windows.Point point] { get => units[(int)point.Y, (int)point.X]; set => units[(int)point.Y, (int)point.X] = value; }
             public List<NodeUnit> Nodes { get => nodes; set => nodes = value; }
             public int Height => height;
             public int Width => width;
@@ -59,6 +60,10 @@ namespace Optimized_Delivery_Simulation
                 this.width = width;
                 units = new Unit[height, width];
                 nodes = new List<NodeUnit>();
+            }
+            public bool isNull(System.Windows.Point point)
+            {
+                return this[point] == null;
             }
         }
         public class Unit
@@ -219,6 +224,10 @@ namespace Optimized_Delivery_Simulation
                 this.x = x;
                 this.y = y;
             }
+            public System.Windows.Point ToPoint()
+            {
+                return new System.Windows.Point(x, y);
+            }
             public static bool operator==(Point a, Point b)
             {
                 return a.x == b.x && a.y == b.y;
@@ -230,6 +239,10 @@ namespace Optimized_Delivery_Simulation
             public bool Equals(Point other)
             {
                 return this == other;
+            }
+            public static implicit operator System.Windows.Point(Point p)
+            {
+                return new System.Windows.Point(p.x, p.y);
             }
         }
 
