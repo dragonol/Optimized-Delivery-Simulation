@@ -9,7 +9,10 @@
         Title="MainWindow" WindowState="Maximized" >
     <Grid x:Name="Window" >
         <Canvas x:Name="MapSectionCover" Width="1920" Height="1080" HorizontalAlignment="Center" VerticalAlignment="Center" PreviewMouseLeftButtonDown="MapSectionCover_PreviewMouseLeftButtonDown" PreviewMouseMove="MapSectionCover_PreviewMouseMove" MouseLeftButtonUp="MapSectionCover_MouseLeftButtonUp" PreviewMouseLeftButtonUp="MapSectionCover_PreviewMouseLeftButtonUp" >
-            <Canvas x:Name="MapSection" VerticalAlignment="Center" HorizontalAlignment="Center" Canvas.Top="0" Canvas.Left="0"></Canvas>
+            <Canvas x:Name="MapSection" VerticalAlignment="Center" HorizontalAlignment="Center" Canvas.Top="0" Canvas.Left="0">
+                <Canvas x:Name="NodeLayer" Panel.ZIndex="1"></Canvas>
+            </Canvas>
+            
         </Canvas>
         
     </Grid>

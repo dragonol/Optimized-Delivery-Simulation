@@ -29,7 +29,7 @@ namespace Optimized_Delivery_Simulation
 
             BuildMap(start);
 
-            Draw(MapComponents, MapSection, MapImage, Brushes.Blue, Thickness);
+            Draw(MapComponents, MapSection, MapImage, new System.Windows.Point(0,0),Brushes.Blue, Thickness);
 
             void BuildMap(NodeUnit nodeUnit)
             {

@@ -17,10 +17,10 @@ namespace Optimized_Delivery_Simulation
 {
     partial class MainWindow
     {
-        public void Draw(GeometryGroup geometries, UIElement element, Image image, Brush color, double thickness)
+        public void Draw(GeometryGroup geometries, UIElement element, Image image, System.Windows.Point pos,Brush color, double thickness)
         {
             GeometryDrawing geometryDrawing = new GeometryDrawing(
-                Brushes.Black,
+                Brushes.Transparent,
                 new Pen(color, thickness), geometries);
 
             DrawingImage drawingImage = new DrawingImage(geometryDrawing);
@@ -32,9 +32,9 @@ namespace Optimized_Delivery_Simulation
             image.Stretch = Stretch.None;
             image.HorizontalAlignment = HorizontalAlignment.Center;
             image.VerticalAlignment = VerticalAlignment.Center;
-            
-            Canvas.SetLeft(image, 0);
-            Canvas.SetTop(image, 0);
+
+            Canvas.SetLeft(image, pos.X);
+            Canvas.SetTop(image, pos.Y);
 
             ((Canvas)element).Children.Add(image);
         }
@@ -60,6 +60,8 @@ namespace Optimized_Delivery_Simulation
 
             while (run != point2)
             {
+                RouteImageAnchor.X = Math.Min(run.X * Space + Thickness/3, RouteImageAnchor.X);
+                RouteImageAnchor.Y = Math.Min(run.Y * Space + Thickness/3, RouteImageAnchor.Y);
                 AddDrawPath(run, LookupPath[point2][run].Previous, geometries);
                 run = LookupPath[point2][run].Previous;
             }

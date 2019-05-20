@@ -26,7 +26,7 @@ namespace Optimized_Delivery_Simulation
         public static readonly int Space = 50;
         public static readonly int SplitChance = 3;
         public static readonly double AverageDistance = 8;
-        public static readonly int Thickness = 35;
+        public static readonly double Thickness = 35;
 
         public static WorldMap Map = new WorldMap(MapSize.height, MapSize.width);
         public static Dictionary<Point, Dictionary<Point, Trail>> LookupPath = new Dictionary<Point, Dictionary<Point, Trail>>();
@@ -40,6 +40,7 @@ namespace Optimized_Delivery_Simulation
         public static Image MapImage = new Image();
         public static Image NodesImage = new Image();
         public static Image RouteImage = new Image();
+        public static System.Windows.Point RouteImageAnchor = new System.Windows.Point(int.MaxValue, int.MaxValue);
 
         public static System.Windows.Point GridMargin = new System.Windows.Point(0, 0);
         public static System.Windows.Point BasePosition;
@@ -53,7 +54,7 @@ namespace Optimized_Delivery_Simulation
         {
             InitializeComponent();
             GenerateMap(Brushes.PowderBlue);
-            //DrawNode(Start, Brushes.AntiqueWhite, Thickness / 2);
+            DrawSingleNode(Start, NodeLayer,Brushes.AntiqueWhite, Thickness / 2);
         }
 
         private void MapSectionCover_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -89,16 +90,25 @@ namespace Optimized_Delivery_Simulation
                 return;
 
             var currPosition = e.GetPosition(MapSection);
-            Console.WriteLine(currPosition);
             currPosition.X = (int)((currPosition.X + Space / 4) / Space);
             currPosition.Y = (int)((currPosition.Y + Space / 4) / Space);
 
+            Console.WriteLine(currPosition);
+
             if (Map.isNull(currPosition))
                 return;
+            
+            Depots.Add(Map[currPosition].Point);
+            DrawSingleNode(currPosition, NodeLayer, Brushes.Yellow, Thickness / 2);
 
-
-
-            DrawSingleNode(currPosition, MapSection, Brushes.Yellow, Thickness / 2);
+            if (Depots.Count == 5) 
+            {
+                CreateLookupDistances(Depots);
+                CreateOptimizedRoute();
+                for (int i = 0; i < OptimizedRoute.Count; i++)
+                    AddDrawRoute(OptimizedRoute[i], OptimizedRoute[(i + 1) % OptimizedRoute.Count], OutputRoute);
+                Draw(OutputRoute, MapSection, RouteImage, RouteImageAnchor, Brushes.Red, Thickness / 3);
+            }
         }
     }
     
