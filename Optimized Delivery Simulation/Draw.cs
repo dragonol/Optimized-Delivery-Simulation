@@ -17,7 +17,7 @@ namespace Optimized_Delivery_Simulation
 {
     partial class MainWindow
     {
-        public void Draw(GeometryGroup geometries, UIElement element, Image image, System.Windows.Point pos,Brush color, double thickness)
+        public void Draw(GeometryGroup geometries, UIElement element, Image image, System.Windows.Point pos, Brush color, double thickness)
         {
             GeometryDrawing geometryDrawing = new GeometryDrawing(
                 Brushes.Transparent,
@@ -25,8 +25,6 @@ namespace Optimized_Delivery_Simulation
 
             DrawingImage drawingImage = new DrawingImage(geometryDrawing);
             drawingImage.Freeze();
-
-            Console.WriteLine(geometryDrawing.IsFrozen);
 
             image.Source = drawingImage;
             image.Stretch = Stretch.None;
@@ -38,21 +36,71 @@ namespace Optimized_Delivery_Simulation
 
             ((Canvas)element).Children.Add(image);
         }
+        public void DrawMap(GeometryGroup[] geometries, UIElement element, Image image, System.Windows.Point pos, double thickness)
+        {
+            DrawingGroup drawingGroup = new DrawingGroup();
+            drawingGroup.Children.Add(new GeometryDrawing(Brushes.Transparent, new Pen(new SolidColorBrush(Color.FromRgb(0x37, 0xDC, 0x94)), thickness), geometries[0]));
+            drawingGroup.Children.Add(new GeometryDrawing(Brushes.Transparent, new Pen(new SolidColorBrush(Color.FromRgb(0xFD, 0x9A, 0x28)), thickness), geometries[1]));
+            drawingGroup.Children.Add(new GeometryDrawing(Brushes.Transparent, new Pen(new SolidColorBrush(Color.FromRgb(0xFA, 0x5C, 0x65)), thickness), geometries[2]));
+            drawingGroup.Children.Add(new GeometryDrawing(Brushes.Transparent, new Pen(Brushes.Gray, thickness / 2), MapDirection));
+            drawingGroup.Children.Add(new GeometryDrawing(Brushes.Transparent, new Pen(new SolidColorBrush(Color.FromRgb(0x26, 0x8A, 0xFF)), thickness * 1.5), MapNodes[0]));
+            drawingGroup.Children.Add(new GeometryDrawing(Brushes.Transparent, new Pen(Brushes.White, thickness), MapNodes[1]));
+            
+            DrawingImage drawingImage = new DrawingImage(drawingGroup);
+            drawingImage.Freeze();
+
+            image.Source = drawingImage;
+            image.Stretch = Stretch.None;
+            image.HorizontalAlignment = HorizontalAlignment.Center;
+            image.VerticalAlignment = VerticalAlignment.Center;
+
+            Canvas.SetLeft(image, pos.X);
+            Canvas.SetTop(image, pos.Y);
+
+            ((Canvas)element).Children.Add(image);
+        }
+        public void AddDrawMapPath(System.Windows.Point point1, System.Windows.Point point2, GeometryGroup geometries)
+        {
+            LineGeometry line = new LineGeometry(
+                new System.Windows.Point(point1.X * Space, point1.Y * Space),
+                new System.Windows.Point(point2.X * Space, point2.Y * Space));
+            geometries.Children.Add(line);
+
+            if (!MapNodeCheck[(int)point1.Y,(int)point1.X])
+            {
+                AddDrawNode(point1, MapNodes[0]);
+                AddDrawNode(point1, MapNodes[1]);
+                MapNodeCheck[(int)point1.Y, (int)point1.X] = true;
+            }
+            if (!MapNodeCheck[(int)point2.Y, (int)point2.X])
+            {
+                AddDrawNode(point2, MapNodes[0]);
+                AddDrawNode(point2, MapNodes[1]);
+                MapNodeCheck[(int)point2.Y, (int)point2.X] = true;
+            }
+        }
+        public static void AddDirection(System.Windows.Point point, int dir, GeometryGroup geometry)
+        {
+            RectangleGeometry rect = new RectangleGeometry(
+                new Rect(point.X * Space, point.Y * Space, Thickness/6*5, 0.01), 90, 90);
+            rect.Transform = new RotateTransform(dir * 90 + 180, point.X * Space, point.Y * Space);
+            geometry.Children.Add(rect);
+        }
         public void AddDrawPath(System.Windows.Point point1, System.Windows.Point point2, GeometryGroup geometries)
         {
             LineGeometry line = new LineGeometry(
                 new System.Windows.Point(point1.X * Space, point1.Y * Space),
                 new System.Windows.Point(point2.X * Space, point2.Y * Space));
             geometries.Children.Add(line);
-            
-            AddDrawNode(point1, geometries);
-            AddDrawNode(point2, geometries);
+
+            AddDrawNode(point1,geometries);
+            AddDrawNode(point2,geometries);
         }
-        public void AddDrawNode(System.Windows.Point point, GeometryGroup geometries)
+        public void AddDrawNode(System.Windows.Point point, GeometryGroup geometry)
         {
             RectangleGeometry rect = new RectangleGeometry(
                 new Rect(point.X * Space, point.Y * Space, 0, 0), 90, 90);
-            geometries.Children.Add(rect);
+            geometry.Children.Add(rect);
         }
         public void AddDrawRoute(Point point1, Point point2, GeometryGroup geometries)
         {
@@ -60,8 +108,8 @@ namespace Optimized_Delivery_Simulation
 
             while (run != point2)
             {
-                RouteImageAnchor.X = Math.Min(run.X * Space + Thickness/3, RouteImageAnchor.X);
-                RouteImageAnchor.Y = Math.Min(run.Y * Space + Thickness/3, RouteImageAnchor.Y);
+                RouteImageAnchor.X = Math.Min(run.X * Space + Thickness/12*7, RouteImageAnchor.X);
+                RouteImageAnchor.Y = Math.Min(run.Y * Space + Thickness/12*7, RouteImageAnchor.Y);
                 AddDrawPath(run, LookupPath[point2][run].Previous, geometries);
                 run = LookupPath[point2][run].Previous;
             }
@@ -84,8 +132,8 @@ namespace Optimized_Delivery_Simulation
             image.HorizontalAlignment = HorizontalAlignment.Center;
             image.VerticalAlignment = VerticalAlignment.Center;
 
-            Canvas.SetLeft(image, point.X * Space + thickness/2);
-            Canvas.SetTop(image, point.Y * Space + thickness/2);
+            Canvas.SetLeft(image, point.X * Space + thickness);
+            Canvas.SetTop(image, point.Y * Space + thickness);
 
             ((Canvas)element).Children.Add(image);
         }

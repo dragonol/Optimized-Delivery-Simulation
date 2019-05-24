@@ -20,8 +20,9 @@ namespace Optimized_Delivery_Simulation
     /// Interaction logic for MainWindow.xaml
     /// </summary>
 
-    partial class MainWindow
+    partial class MainWindow 
     {
+        public static int[] TrafficPool = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3 };
         public class Axis
         {
             public static int Horizonal = 0;
@@ -98,27 +99,50 @@ namespace Optimized_Delivery_Simulation
         {
             private NodeUnit[] adjacentNodes;
             private int[] adjacentDistances;
+            private int[] adjacentTraffic;
 
             public NodeUnit[] AdjacentNodes { get => adjacentNodes; set => adjacentNodes = value; }
             public int[] AdjacentDistances { get => adjacentDistances; set => adjacentDistances = value; }
+            public int[] AdjacentTraffic { get => adjacentTraffic; set => adjacentTraffic = value; }
+
             public NodeUnit(int y, int x) : base(y, x)
             {
                 adjacentNodes = new NodeUnit[4];
                 adjacentDistances = new int[4];
+                adjacentTraffic = new int[4];
                 Map.Nodes.Add(this);
             }
             public NodeUnit(Point point) : base(point)
             {
                 adjacentNodes = new NodeUnit[4];
                 adjacentDistances = new int[4];
+                adjacentTraffic = new int[4];
                 Map.Nodes.Add(this);
             }
-            public static void Connect(NodeUnit node1, NodeUnit node2, int dirNode1, int dirNode2, int distance)
+            public static void Connect(NodeUnit node1, NodeUnit node2, int dirNode1, int dirNode2, int distance, int traffic)
             {
                 node1.AdjacentNodes[dirNode2] = node2;
                 node1.AdjacentDistances[dirNode2] = distance;
+                node1.AdjacentTraffic[dirNode2] = traffic;
+
+                if (!MapDirection.IsFrozen)
+                    AddDirection(node1.Point, dirNode2, MapDirection);
+
                 node2.AdjacentNodes[dirNode1] = node1;
                 node2.AdjacentDistances[dirNode1] = distance;
+                node2.AdjacentTraffic[dirNode1] = traffic;
+
+                if (!MapDirection.IsFrozen)
+                    AddDirection(node2.Point, dirNode1, MapDirection);
+            }
+            public static void ConnectOneWay(NodeUnit node1, NodeUnit node2, int dirNode1, int dirNode2, int distance, int traffic)
+            {
+                    node1.AdjacentNodes[dirNode2] = node2;
+                    node1.AdjacentDistances[dirNode2] = distance;
+                    node1.AdjacentTraffic[dirNode2] = traffic;
+
+                    if (!MapDirection.IsFrozen)
+                        AddDirection(node1.Point, dirNode2, MapDirection);
             }
             public static void CreateNode(RouteUnit routeUnit)
             {
@@ -139,8 +163,21 @@ namespace Optimized_Delivery_Simulation
 
                     newNode = new NodeUnit(routeUnit.Point);
 
-                    Connect(newNode, node1, Direction.Left, Direction.Right, run1);
-                    Connect(newNode, node2, Direction.Right, Direction.Left, run2);
+                    if (node1.adjacentNodes[Direction.Left] == null)
+                    {
+                        ConnectOneWay(newNode, node1, Direction.Left, Direction.Right, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
+                        ConnectOneWay(node2, newNode, Direction.Right, Direction.Left, run2, TrafficPool[Random.Next(TrafficPool.Length)]);
+                    }
+                    else if(node2.adjacentNodes[Direction.Right]==null)
+                    {
+                        ConnectOneWay(newNode, node2, Direction.Left, Direction.Right, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
+                        ConnectOneWay(node1, newNode, Direction.Right, Direction.Left, run2, TrafficPool[Random.Next(TrafficPool.Length)]);
+                    }
+                    else
+                    {
+                        Connect(newNode, node1, Direction.Left, Direction.Right, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
+                        Connect(newNode, node2, Direction.Right, Direction.Left, run2, TrafficPool[Random.Next(TrafficPool.Length)]);
+                    }
                 }
                 else
                 {
@@ -151,8 +188,21 @@ namespace Optimized_Delivery_Simulation
 
                     newNode = new NodeUnit(routeUnit.Point);
 
-                    Connect(newNode, node1, Direction.Up, Direction.Down, run1);
-                    Connect(newNode, node2, Direction.Down, Direction.Up, run2);
+                    if (node1.adjacentNodes[Direction.Up] == null)
+                    {
+                        ConnectOneWay(newNode, node1, Direction.Up, Direction.Down, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
+                        ConnectOneWay(node2, newNode, Direction.Down, Direction.Up, run2, TrafficPool[Random.Next(TrafficPool.Length)]);
+                    }
+                    else if (node2.adjacentNodes[Direction.Down] == null)
+                    {
+                        ConnectOneWay(newNode, node2, Direction.Up, Direction.Down, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
+                        ConnectOneWay(newNode, node1, Direction.Down, Direction.Up, run2, TrafficPool[Random.Next(TrafficPool.Length)]);
+                    }
+                    else
+                    {
+                        Connect(newNode, node1, Direction.Up, Direction.Down, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
+                        Connect(node2, newNode, Direction.Down, Direction.Up, run2, TrafficPool[Random.Next(TrafficPool.Length)]);
+                    }
                 }
                 Map[y, x] = newNode;
             }

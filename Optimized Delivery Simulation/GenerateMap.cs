@@ -21,7 +21,12 @@ namespace Optimized_Delivery_Simulation
         {
             int height = MapSize.height;
             int width = MapSize.width;
-            
+
+            for (int i = 0; i < MapComponents.Length; i++)
+                MapComponents[i] = new GeometryGroup();
+            for (int i = 0; i < MapNodes.Length; i++)
+                MapNodes[i] = new GeometryGroup();
+
             NodeUnit start = new NodeUnit(Random.Next(0, height - 1), Random.Next(0, width - 1));
             Start = start.Point;
 
@@ -29,7 +34,7 @@ namespace Optimized_Delivery_Simulation
 
             BuildMap(start);
 
-            Draw(MapComponents, MapSection, MapImage, new System.Windows.Point(0,0),Brushes.Blue, Thickness);
+            DrawMap(MapComponents, MapSection, MapImage, new System.Windows.Point(0,0), Thickness);
 
             void BuildMap(NodeUnit nodeUnit)
             {
@@ -96,16 +101,16 @@ namespace Optimized_Delivery_Simulation
 
                         if ((curr as NodeUnit) != null)
                         {
-                            NodeUnit.Connect((NodeUnit)curr, nodeUnit, direction, (direction + 2) % 4, i);
-                            AddDrawPath(nodeUnit.Point, curr.Point, MapComponents);
+                            NodeUnit.ConnectOneWay(nodeUnit, (NodeUnit)curr, (direction + 2) % 4, direction, i, TrafficPool[Random.Next(TrafficPool.Length)]);
+                            AddDrawMapPath(nodeUnit.Point, curr.Point, MapComponents[nodeUnit.AdjacentTraffic[direction]-1]);
                             return false;
                         }
 
                         if ((curr as RouteUnit) != null)
                         {
                             NodeUnit.CreateNode((RouteUnit)curr);
-                            NodeUnit.Connect((NodeUnit)Map[curr.Point], nodeUnit, direction, (direction + 2) % 4, i);
-                            AddDrawPath(nodeUnit.Point, curr.Point, MapComponents);
+                            NodeUnit.Connect(nodeUnit, (NodeUnit)Map[curr.Point], (direction + 2) % 4, direction, i, TrafficPool[Random.Next(TrafficPool.Length)]);
+                            AddDrawMapPath(nodeUnit.Point, curr.Point, MapComponents[nodeUnit.AdjacentTraffic[direction] - 1]);
                             return false;
                         }
 
@@ -118,8 +123,8 @@ namespace Optimized_Delivery_Simulation
                     curr = Map[y + *m * (direction / 2 * 2 - 1), x + *n * (direction / 2 * 2 - 1)] =
                         new NodeUnit(y + *m * (direction / 2 * 2 - 1), x + *n * (direction / 2 * 2 - 1));
 
-                    NodeUnit.Connect((NodeUnit)curr, nodeUnit, direction, (direction + 2) % 4, i);
-                    AddDrawPath(nodeUnit.Point, curr.Point, MapComponents);
+                    NodeUnit.Connect((NodeUnit)curr, nodeUnit, direction, (direction + 2) % 4, i, TrafficPool[Random.Next(TrafficPool.Length)]);
+                    AddDrawMapPath(nodeUnit.Point, curr.Point, MapComponents[nodeUnit.AdjacentTraffic[direction] - 1]);
                     
                     result = (NodeUnit)curr;
                     return true;

@@ -23,10 +23,10 @@ namespace Optimized_Delivery_Simulation
     {
         public static readonly Random Random = new Random();
         public static readonly (int height, int width) MapSize = (30, 60);
-        public static readonly int Space = 50;
-        public static readonly int SplitChance = 3;
+        public static readonly int Space = 35;
+        public static readonly int SplitChance = 7;
         public static readonly double AverageDistance = 8;
-        public static readonly double Thickness = 35;
+        public static readonly double Thickness = 15;
 
         public static WorldMap Map = new WorldMap(MapSize.height, MapSize.width);
         public static Dictionary<Point, Dictionary<Point, Trail>> LookupPath = new Dictionary<Point, Dictionary<Point, Trail>>();
@@ -34,7 +34,10 @@ namespace Optimized_Delivery_Simulation
         public static Point Start;
         public static List<Point> Depots = new List<Point>();
 
-        public static GeometryGroup MapComponents = new GeometryGroup();
+        public static bool[,] MapNodeCheck = new bool[MapSize.height, MapSize.width];
+        public static GeometryGroup[] MapComponents = new GeometryGroup[3];
+        public static GeometryGroup[] MapNodes = new GeometryGroup[2];
+        public static GeometryGroup MapDirection = new GeometryGroup();
         public static GeometryGroup InputNodes = new GeometryGroup();
         public static GeometryGroup OutputRoute = new GeometryGroup();
         public static Image MapImage = new Image();
@@ -48,6 +51,8 @@ namespace Optimized_Delivery_Simulation
         public static bool IsDragging = false;
         public static bool MouseLeftDown = false;
 
+        public static double ZoomLimit = 0;
+        public static System.Windows.Point ZoominPoint = new System.Windows.Point();
         public static double MapScale = 1;
 
         public MainWindow()
@@ -69,12 +74,19 @@ namespace Optimized_Delivery_Simulation
             {
                 IsDragging = true;
                 CurrPosition = Mouse.GetPosition(MapSectionCover);
+                double currTop = Canvas.GetTop(MapSection);
+                double currLeft = Canvas.GetLeft(MapSection);
+
                 double absLeft = CurrPosition.X - BasePosition.X;
                 double absTop = CurrPosition.Y - BasePosition.Y;
 
-                Canvas.SetLeft(MapSection, Canvas.GetLeft(MapSection) + absLeft);
-                Canvas.SetTop(MapSection, Canvas.GetTop(MapSection) + absTop);
+                if (currTop + absTop >= -350 && currTop + absTop <= 700)
+                    Canvas.SetTop(MapSection, currTop + absTop);
+                if (currLeft + absLeft <= 1300 && currLeft + absLeft >= -940)
+                    Canvas.SetLeft(MapSection, currLeft + absLeft);
+
                 BasePosition = CurrPosition;
+
             }
         }
 
@@ -109,6 +121,30 @@ namespace Optimized_Delivery_Simulation
                     AddDrawRoute(OptimizedRoute[i], OptimizedRoute[(i + 1) % OptimizedRoute.Count], OutputRoute);
                 Draw(OutputRoute, MapSection, RouteImage, RouteImageAnchor, Brushes.Red, Thickness / 3);
             }
+        }
+
+        private void MapSectionCover_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var currPosition = e.GetPosition(MapSection);
+            var matrix = MapSection.RenderTransform.Value;
+
+            if (e.Delta > 0)
+            {
+                if (ZoomLimit >= 1)
+                    return;
+                matrix.ScaleAtPrepend(1.1, 1.1, currPosition.X, currPosition.Y);
+                ZoominPoint = currPosition;
+                ZoomLimit += 0.1;
+            }
+            else
+            {
+                if (ZoomLimit <= 0)
+                    return;
+                matrix.ScaleAtPrepend(1 / 1.1, 1 / 1.1, ZoominPoint.X, ZoominPoint.Y);
+                ZoomLimit -= 0.1;
+            }
+
+            MapSection.RenderTransform = new MatrixTransform(matrix);
         }
     }
     
