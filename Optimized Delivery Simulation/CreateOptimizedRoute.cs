@@ -10,7 +10,7 @@ namespace Optimized_Delivery_Simulation
     {
         public void CreateOptimizedRoute()
         {
-            int totalDistance = 0;
+            double totalDistance = 0;
             int nodeCount = OptimizedRoute.Count;
             int temperature = 50;
 
@@ -26,10 +26,10 @@ namespace Optimized_Delivery_Simulation
             {
                 for (int j = i + 1; j < nodeCount; j++)
                 {
-                    int distance_FirstPrevios_First = LookupPath[OptimizedRoute[i - 1]][OptimizedRoute[i]].Distance;
-                    int distance_SecondNext_Second = LookupPath[OptimizedRoute[(j + 1) % nodeCount]][OptimizedRoute[j]].Distance;
-                    int distance_FirstPrevios_Second = LookupPath[OptimizedRoute[i - 1]][OptimizedRoute[j]].Distance;
-                    int distance_SecondNext_First = LookupPath[OptimizedRoute[(j + 1) % nodeCount]][OptimizedRoute[i]].Distance;
+                    double distance_FirstPrevios_First = LookupPath[OptimizedRoute[i - 1]][OptimizedRoute[i]].Distance;
+                    double distance_SecondNext_Second = LookupPath[OptimizedRoute[(j + 1) % nodeCount]][OptimizedRoute[j]].Distance;
+                    double distance_FirstPrevios_Second = LookupPath[OptimizedRoute[i - 1]][OptimizedRoute[j]].Distance;
+                    double distance_SecondNext_First = LookupPath[OptimizedRoute[(j + 1) % nodeCount]][OptimizedRoute[i]].Distance;
                     if (distance_FirstPrevios_First + distance_SecondNext_Second > distance_FirstPrevios_Second + distance_SecondNext_First || 
                         Random.Next(100) < temperature)
                     {

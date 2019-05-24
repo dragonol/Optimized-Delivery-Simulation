@@ -29,7 +29,7 @@ namespace Optimized_Delivery_Simulation
                 {
                     Point depotPos = depot.Point;
                     sourcePath[depotPos] = new Trail(null, int.MaxValue);
-                    set.Enqueue(depotPos, sourcePath[depotPos].Distance);
+                    set.Enqueue(depotPos, (float)sourcePath[depotPos].Distance);
                 }
 
                 sourcePath[sourcePos].Distance = 0;
@@ -38,20 +38,20 @@ namespace Optimized_Delivery_Simulation
                 while (set.Count > 0)
                 {
                     Point curr = set.Dequeue();
-                    int currDistance = sourcePath[curr].Distance;
+                    double currDistance = sourcePath[curr].Distance;
 
                     foreach (NodeUnit node in ((NodeUnit)Map[curr.Y, curr.X]).AdjacentNodes)
                     {
                         if (node == null)
                             continue;
 
-                        int alt = currDistance + Unit.Distance(node, Map[curr.Y, curr.X]);
+                        double alt = currDistance + Unit.Distance(node, Map[curr.Y, curr.X]) * (int)(Unit.Traffic(node, Map[curr.Y, curr.X])) * 100;
 
                         if (alt < sourcePath[node.Point].Distance)
                         {
                             sourcePath[node.Point].Distance = alt;
                             sourcePath[node.Point].Previous = curr;
-                            set.UpdatePriority(node.Point, alt);
+                            set.UpdatePriority(node.Point, (float)alt);
                         }
                     }
                 }

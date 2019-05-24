@@ -84,6 +84,23 @@ namespace Optimized_Delivery_Simulation
             {
                 return Math.Abs(unit1.Point.X - unit2.Point.X) + Math.Abs(unit1.Point.Y - unit2.Point.Y);
             }
+            public static double Traffic(Unit unit1, Unit unit2)
+            {
+                if (unit1.point.X == unit2.point.X)
+                {
+                    if (unit1.point.Y > unit2.point.Y)
+                        return ((NodeUnit)unit1).AdjacentTraffic[Direction.Up];
+                    else
+                        return ((NodeUnit)unit1).AdjacentTraffic[Direction.Down];
+                }
+                else
+                {
+                    if (unit1.point.X > unit2.point.X) 
+                        return ((NodeUnit)unit1).AdjacentTraffic[Direction.Left];
+                    else
+                        return ((NodeUnit)unit1).AdjacentTraffic[Direction.Right];
+                }
+            }
         }
         public class RouteUnit : Unit
         {
@@ -211,10 +228,10 @@ namespace Optimized_Delivery_Simulation
         public class Trail
         {
             private Point previous;
-            private int distance;
+            private double distance;
 
             public Point Previous { get => previous; set => previous = value; }
-            public int Distance { get => distance; set => distance = value; }
+            public double Distance { get => distance; set => distance = value; }
             public Trail(Point previous, int distance)
             {
                 Previous = previous;

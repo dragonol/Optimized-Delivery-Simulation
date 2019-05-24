@@ -101,7 +101,7 @@ namespace Optimized_Delivery_Simulation
 
                         if ((curr as NodeUnit) != null)
                         {
-                            NodeUnit.ConnectOneWay(nodeUnit, (NodeUnit)curr, (direction + 2) % 4, direction, i, TrafficPool[Random.Next(TrafficPool.Length)]);
+                            NodeUnit.Connect(nodeUnit, (NodeUnit)curr, (direction + 2) % 4, direction, i, TrafficPool[Random.Next(TrafficPool.Length)]);
                             AddDrawMapPath(nodeUnit.Point, curr.Point, MapComponents[nodeUnit.AdjacentTraffic[direction]-1]);
                             return false;
                         }

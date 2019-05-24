@@ -109,7 +109,7 @@ namespace Optimized_Delivery_Simulation
             while (run != point2)
             {
                 RouteImageAnchor.X = Math.Min(run.X * Space + Thickness/12*7, RouteImageAnchor.X);
-                RouteImageAnchor.Y = Math.Min(run.Y * Space + Thickness/12*7, RouteImageAnchor.Y);
+                RouteImageAnchor.Y = Math.Min(run.Y * Space + Thickness/32*29, RouteImageAnchor.Y);
                 AddDrawPath(run, LookupPath[point2][run].Previous, geometries);
                 run = LookupPath[point2][run].Previous;
             }
@@ -133,7 +133,7 @@ namespace Optimized_Delivery_Simulation
             image.VerticalAlignment = VerticalAlignment.Center;
 
             Canvas.SetLeft(image, point.X * Space + thickness);
-            Canvas.SetTop(image, point.Y * Space + thickness);
+            Canvas.SetTop(image, point.Y * Space + thickness*13/8);
 
             ((Canvas)element).Children.Add(image);
         }
