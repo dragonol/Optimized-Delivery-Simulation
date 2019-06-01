@@ -105,10 +105,21 @@ namespace Optimized_Delivery_Simulation
             currPosition.X = (int)((currPosition.X + Space / 4) / Space);
             currPosition.Y = (int)((currPosition.Y + Space / 4) / Space);
 
-            Console.WriteLine(currPosition);
+            //Console.WriteLine(currPosition);
 
-            if (Map.isNull(currPosition))
+            if (currPosition.X < 0 || currPosition.Y < 0 || Map.isNull(currPosition))
                 return;
+
+            {
+                var node = ((NodeUnit)Map[currPosition]).AdjacentNodes;
+                Console.WriteLine();
+                foreach (var i in node)
+                    if (i == null)
+                        Console.WriteLine("NULL");
+                    else
+                        Console.WriteLine(i.Point);
+                Console.WriteLine();
+            }
             
             Depots.Add(Map[currPosition].Point);
             DrawSingleNode(currPosition, NodeLayer, Brushes.Yellow, Thickness / 2);

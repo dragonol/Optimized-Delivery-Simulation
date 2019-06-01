@@ -22,7 +22,7 @@ namespace Optimized_Delivery_Simulation
 
     partial class MainWindow 
     {
-        public static int[] TrafficPool = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3 };
+        public static int[] TrafficPool = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3 };
         public class Axis
         {
             public static int Horizonal = 0;
@@ -310,6 +310,10 @@ namespace Optimized_Delivery_Simulation
             public static implicit operator System.Windows.Point(Point p)
             {
                 return new System.Windows.Point(p.x, p.y);
+            }
+            public override string ToString()
+            {
+                return x + ", " + y;
             }
         }
 
