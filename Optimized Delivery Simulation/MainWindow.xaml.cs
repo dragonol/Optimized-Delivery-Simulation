@@ -55,11 +55,28 @@ namespace Optimized_Delivery_Simulation
         public static System.Windows.Point ZoominPoint = new System.Windows.Point();
         public static double MapScale = 1;
 
+        public static System.Windows.Point temp = new System.Windows.Point(-1, -1);
+
         public MainWindow()
         {
             InitializeComponent();
             GenerateMap(Brushes.PowderBlue);
             DrawSingleNode(Start, NodeLayer,Brushes.AntiqueWhite, Thickness / 2);
+            MapSectionCover.PreviewMouseRightButtonUp += (s, e) =>
+            {
+                var curr = e.GetPosition(MapSection);
+                curr.X = (int)((curr.X + Space / 4) / Space);
+                curr.Y = (int)((curr.Y + Space / 4) / Space);
+                if (temp != new System.Windows.Point(-1, -1))
+                {
+                    Console.WriteLine();
+                    Console.WriteLine(LookupPath[Map[curr].Point][Map[temp].Point].Distance);
+                    Console.WriteLine(LookupPath[Map[temp].Point][Map[curr].Point].Distance);
+                    temp = new System.Windows.Point(-1, -1);
+                }
+                else
+                    temp = curr;
+            };
         }
 
         private void MapSectionCover_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -105,22 +122,24 @@ namespace Optimized_Delivery_Simulation
             currPosition.X = (int)((currPosition.X + Space / 4) / Space);
             currPosition.Y = (int)((currPosition.Y + Space / 4) / Space);
 
-            //Console.WriteLine(currPosition);
-
             if (currPosition.X < 0 || currPosition.Y < 0 || Map.isNull(currPosition))
                 return;
 
+            
+            //Console.WriteLine("///////////");
+            //Console.WriteLine("currPos:" + currPosition);
+            if(Map[currPosition] as NodeUnit != null)
             {
                 var node = ((NodeUnit)Map[currPosition]).AdjacentNodes;
-                Console.WriteLine();
-                foreach (var i in node)
-                    if (i == null)
-                        Console.WriteLine("NULL");
-                    else
-                        Console.WriteLine(i.Point);
-                Console.WriteLine();
+                //Console.WriteLine("Adjac: ");
+                //foreach (var i in node)
+                //    if (i == null)
+                //        Console.WriteLine("NULL");
+                //    else
+                //        Console.WriteLine(i.Point);
+                //Console.WriteLine();
             }
-            
+
             Depots.Add(Map[currPosition].Point);
             DrawSingleNode(currPosition, NodeLayer, Brushes.Yellow, Thickness / 2);
 
@@ -128,10 +147,16 @@ namespace Optimized_Delivery_Simulation
             {
                 CreateLookupDistances(Depots);
                 CreateOptimizedRoute();
+                //Console.WriteLine("Route: " + OptimizedRoute.Count);
+                
                 for (int i = 0; i < OptimizedRoute.Count; i++)
+                {
                     AddDrawRoute(OptimizedRoute[i], OptimizedRoute[(i + 1) % OptimizedRoute.Count], OutputRoute);
+                    //Console.WriteLine(OptimizedRoute[i]);
+                }
                 Draw(OutputRoute, MapSection, RouteImage, RouteImageAnchor, Brushes.Red, Thickness / 3);
             }
+            //Console.WriteLine("///////////");
         }
 
         private void MapSectionCover_PreviewMouseWheel(object sender, MouseWheelEventArgs e)

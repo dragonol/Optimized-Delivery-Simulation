@@ -105,7 +105,6 @@ namespace Optimized_Delivery_Simulation
         public void AddDrawRoute(Point point1, Point point2, GeometryGroup geometries)
         {
             Point run = point1;
-
             while (run != point2)
             {
                 RouteImageAnchor.X = Math.Min(run.X * Space + Thickness/12*7, RouteImageAnchor.X);
