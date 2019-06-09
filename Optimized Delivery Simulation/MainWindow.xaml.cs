@@ -70,8 +70,36 @@ namespace Optimized_Delivery_Simulation
                 if (temp != new System.Windows.Point(-1, -1))
                 {
                     Console.WriteLine();
-                    Console.WriteLine(LookupPath[Map[curr].Point][Map[temp].Point].Distance);
-                    Console.WriteLine(LookupPath[Map[temp].Point][Map[curr].Point].Distance);
+                    //Console.WriteLine(LookupPath[Map[curr].Point][Map[temp].Point].Distance);
+                    //Console.WriteLine(LookupPath[Map[temp].Point][Map[curr].Point].Distance);
+                    if (curr.X == temp.X)
+                        if (curr.Y < temp.Y)
+                        {
+                            Console.WriteLine(((NodeUnit)Map[curr]).AdjacentTraffic[Direction.Down]);
+                            Console.WriteLine(((NodeUnit)Map[temp]).AdjacentTraffic[Direction.Up]);
+                            Console.WriteLine(((NodeUnit)Map[curr]).AdjacentTraffic[Direction.Down] * Unit.Distance(curr, temp));
+                        }
+                        else
+                        {
+                            Console.WriteLine(((NodeUnit)Map[curr]).AdjacentTraffic[Direction.Up]);
+                            Console.WriteLine(((NodeUnit)Map[temp]).AdjacentTraffic[Direction.Down]);
+                            Console.WriteLine(((NodeUnit)Map[curr]).AdjacentTraffic[Direction.Up] * Unit.Distance(curr, temp));
+                        }
+                    else
+                    {
+                        if (curr.X < temp.X)
+                        {
+                            Console.WriteLine(((NodeUnit)Map[curr]).AdjacentTraffic[Direction.Right]);
+                            Console.WriteLine(((NodeUnit)Map[temp]).AdjacentTraffic[Direction.Left]);
+                            Console.WriteLine(((NodeUnit)Map[curr]).AdjacentTraffic[Direction.Right]* Unit.Distance(curr,temp));
+                        }
+                        else
+                        {
+                            Console.WriteLine(((NodeUnit)Map[curr]).AdjacentTraffic[Direction.Left]);
+                            Console.WriteLine(((NodeUnit)Map[temp]).AdjacentTraffic[Direction.Right]);
+                            Console.WriteLine(((NodeUnit)Map[curr]).AdjacentTraffic[Direction.Left] * Unit.Distance(curr, temp));
+                        }
+                    }
                     temp = new System.Windows.Point(-1, -1);
                 }
                 else
@@ -127,17 +155,17 @@ namespace Optimized_Delivery_Simulation
 
             
             //Console.WriteLine("///////////");
-            //Console.WriteLine("currPos:" + currPosition);
+            Console.WriteLine("currPos:" + currPosition);
             if(Map[currPosition] as NodeUnit != null)
             {
                 var node = ((NodeUnit)Map[currPosition]).AdjacentNodes;
-                //Console.WriteLine("Adjac: ");
-                //foreach (var i in node)
-                //    if (i == null)
-                //        Console.WriteLine("NULL");
-                //    else
-                //        Console.WriteLine(i.Point);
-                //Console.WriteLine();
+                Console.WriteLine("Adjac: ");
+                foreach (var i in node)
+                    if (i == null)
+                        Console.WriteLine("NULL");
+                    else
+                        Console.WriteLine(i.Point);
+                Console.WriteLine();
             }
 
             Depots.Add(Map[currPosition].Point);
@@ -147,12 +175,12 @@ namespace Optimized_Delivery_Simulation
             {
                 CreateLookupDistances(Depots);
                 CreateOptimizedRoute();
-                //Console.WriteLine("Route: " + OptimizedRoute.Count);
-                
+                Console.WriteLine("Route: " + OptimizedRoute.Count);
+
                 for (int i = 0; i < OptimizedRoute.Count; i++)
                 {
                     AddDrawRoute(OptimizedRoute[i], OptimizedRoute[(i + 1) % OptimizedRoute.Count], OutputRoute);
-                    //Console.WriteLine(OptimizedRoute[i]);
+                    Console.WriteLine(OptimizedRoute[i]);
                 }
                 Draw(OutputRoute, MapSection, RouteImage, RouteImageAnchor, Brushes.Red, Thickness / 3);
             }

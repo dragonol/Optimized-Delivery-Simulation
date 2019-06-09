@@ -45,7 +45,7 @@ namespace Optimized_Delivery_Simulation
                         if (node == null)
                             continue;
 
-                        double alt = currDistance + Unit.Distance(node, Map[curr.Y, curr.X]) /** Unit.Traffic(node, Map[curr.Y, curr.X])*/;
+                        double alt = currDistance + Unit.Distance(node.Point, curr) * Unit.Traffic(node, Map[curr.Y, curr.X]);
 
                         if (alt < sourcePath[node.Point].Distance)
                         {

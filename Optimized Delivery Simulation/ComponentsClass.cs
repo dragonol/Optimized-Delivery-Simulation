@@ -84,21 +84,25 @@ namespace Optimized_Delivery_Simulation
             {
                 return Math.Abs(unit1.Point.X - unit2.Point.X) + Math.Abs(unit1.Point.Y - unit2.Point.Y);
             }
+            public static int Distance(System.Windows.Point unit1, System.Windows.Point unit2)
+            {
+                return (int)Math.Abs(unit1.X - unit2.X) + (int)Math.Abs(unit1.Y - unit2.Y);
+            }
             public static double Traffic(Unit unit1, Unit unit2)
             {
                 if (unit1.point.X == unit2.point.X)
                 {
                     if (unit1.point.Y > unit2.point.Y)
-                        return ((NodeUnit)unit1).AdjacentTraffic[Direction.Up];
+                        return Math.Max(((NodeUnit)unit1).AdjacentTraffic[Direction.Up], ((NodeUnit)unit2).AdjacentTraffic[Direction.Down]);
                     else
-                        return ((NodeUnit)unit1).AdjacentTraffic[Direction.Down];
+                        return Math.Max(((NodeUnit)unit1).AdjacentTraffic[Direction.Down], ((NodeUnit)unit2).AdjacentTraffic[Direction.Up]);
                 }
                 else
                 {
                     if (unit1.point.X > unit2.point.X) 
-                        return ((NodeUnit)unit1).AdjacentTraffic[Direction.Left];
+                        return Math.Max(((NodeUnit)unit1).AdjacentTraffic[Direction.Left], ((NodeUnit)unit2).AdjacentTraffic[Direction.Right]);
                     else
-                        return ((NodeUnit)unit1).AdjacentTraffic[Direction.Right];
+                        return Math.Max(((NodeUnit)unit1).AdjacentTraffic[Direction.Right], ((NodeUnit)unit2).AdjacentTraffic[Direction.Left]);
                 }
             }
         }
@@ -182,18 +186,18 @@ namespace Optimized_Delivery_Simulation
 
                     if (node1.adjacentNodes[Direction.Left] == null)
                     {
-                        ConnectOneWay(newNode, node1, Direction.Left, Direction.Right, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
-                        ConnectOneWay(node2, newNode, Direction.Left, Direction.Right, run2, TrafficPool[Random.Next(TrafficPool.Length)]);
+                        ConnectOneWay(newNode, node1, Direction.Left, Direction.Right, run1, node2.AdjacentTraffic[Direction.Right]);
+                        ConnectOneWay(node2, newNode, Direction.Left, Direction.Right, run2, node2.AdjacentTraffic[Direction.Right]);
                     }
                     else if (node2.adjacentNodes[Direction.Right] == null)
                     {
-                        ConnectOneWay(newNode, node2, Direction.Right, Direction.Left, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
-                        ConnectOneWay(node1, newNode, Direction.Right, Direction.Left, run2, TrafficPool[Random.Next(TrafficPool.Length)]);
+                        ConnectOneWay(newNode, node2, Direction.Right, Direction.Left, run1, node1.AdjacentTraffic[Direction.Left]);
+                        ConnectOneWay(node1, newNode, Direction.Right, Direction.Left, run2, node1.AdjacentTraffic[Direction.Left]);
                     }
                     else
                     {
-                        Connect(newNode, node1, Direction.Left, Direction.Right, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
-                        Connect(newNode, node2, Direction.Right, Direction.Left, run2, TrafficPool[Random.Next(TrafficPool.Length)]);
+                        Connect(newNode, node1, Direction.Left, Direction.Right, run1, node1.AdjacentTraffic[Direction.Left]);
+                        Connect(newNode, node2, Direction.Right, Direction.Left, run2, node2.AdjacentTraffic[Direction.Right]);
                     }
                     //Connect(newNode, node1, Direction.Left, Direction.Right, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
                     //Connect(newNode, node2, Direction.Right, Direction.Left, run2, TrafficPool[Random.Next(TrafficPool.Length)]);
@@ -209,18 +213,18 @@ namespace Optimized_Delivery_Simulation
 
                     if (node1.adjacentNodes[Direction.Up] == null)
                     {
-                        ConnectOneWay(newNode, node1, Direction.Up, Direction.Down, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
-                        ConnectOneWay(node2, newNode, Direction.Up, Direction.Down, run2, TrafficPool[Random.Next(TrafficPool.Length)]);
+                        ConnectOneWay(newNode, node1, Direction.Up, Direction.Down, run1, node2.AdjacentTraffic[Direction.Down]);
+                        ConnectOneWay(node2, newNode, Direction.Up, Direction.Down, run2, node2.AdjacentTraffic[Direction.Down]);
                     }
                     else if (node2.adjacentNodes[Direction.Down] == null)
                     {
-                        ConnectOneWay(newNode, node2, Direction.Down, Direction.Up, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
-                        ConnectOneWay(node1, newNode, Direction.Down, Direction.Up, run2, TrafficPool[Random.Next(TrafficPool.Length)]);
+                        ConnectOneWay(newNode, node2, Direction.Down, Direction.Up, run1, node1.AdjacentTraffic[Direction.Up]);
+                        ConnectOneWay(node1, newNode, Direction.Down, Direction.Up, run2, node1.AdjacentTraffic[Direction.Up]);
                     }
                     else
                     {
-                        Connect(newNode, node1, Direction.Up, Direction.Down, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
-                        Connect(newNode, node2, Direction.Down, Direction.Up, run2, TrafficPool[Random.Next(TrafficPool.Length)]);
+                        Connect(newNode, node1, Direction.Up, Direction.Down, run1, node2.AdjacentTraffic[Direction.Down]);
+                        Connect(newNode, node2, Direction.Down, Direction.Up, run2, node2.AdjacentTraffic[Direction.Down]);
                     }
                     //Connect(newNode, node1, Direction.Up, Direction.Down, run1, TrafficPool[Random.Next(TrafficPool.Length)]);
                     //Connect(newNode, node2, Direction.Down, Direction.Up, run2, TrafficPool[Random.Next(TrafficPool.Length)]);

@@ -104,13 +104,13 @@ namespace Optimized_Delivery_Simulation
         }
         public void AddDrawRoute(Point point1, Point point2, GeometryGroup geometries)
         {
-            Point run = point1;
-            while (run != point2)
+            Point run = point2;
+            while (run != point1)
             {
                 RouteImageAnchor.X = Math.Min(run.X * Space + Thickness/12*7, RouteImageAnchor.X);
                 RouteImageAnchor.Y = Math.Min(run.Y * Space + Thickness/32*29, RouteImageAnchor.Y);
-                AddDrawPath(run, LookupPath[point2][run].Previous, geometries);
-                run = LookupPath[point2][run].Previous;
+                AddDrawPath(run, LookupPath[point1][run].Previous, geometries);
+                run = LookupPath[point1][run].Previous;
             }
         }
         public void DrawSingleNode(System.Windows.Point point, UIElement element, Brush color, double thickness)
