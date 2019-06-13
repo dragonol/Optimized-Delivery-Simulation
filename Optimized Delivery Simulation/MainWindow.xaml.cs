@@ -37,6 +37,7 @@ namespace Optimized_Delivery_Simulation
         public static bool[,] MapNodeCheck = new bool[MapSize.height, MapSize.width];
         public static GeometryGroup[] MapComponents = new GeometryGroup[3];
         public static GeometryGroup[] MapNodes = new GeometryGroup[2];
+        public static GeometryGroup SingleNodes = new GeometryGroup();
         public static GeometryGroup MapDirection = new GeometryGroup();
         public static GeometryGroup InputNodes = new GeometryGroup();
         public static GeometryGroup OutputRoute = new GeometryGroup();
@@ -54,6 +55,8 @@ namespace Optimized_Delivery_Simulation
         public static double ZoomLimit = 0;
         public static System.Windows.Point ZoominPoint = new System.Windows.Point();
         public static double MapScale = 1;
+        public static double limHorizontal = MapSize.width / 2 * Space;
+        public static double limVertical = MapSize.height / 2 * Space;
 
         public static System.Windows.Point temp = new System.Windows.Point(-1, -1);
 
@@ -61,7 +64,32 @@ namespace Optimized_Delivery_Simulation
         {
             InitializeComponent();
             GenerateMap(Brushes.PowderBlue);
-            DrawSingleNode(Start, NodeLayer,Brushes.AntiqueWhite, Thickness / 2);
+            InitSingleNodesStorage(SingleNodes, MapSection, Brushes.Gold, Thickness / 2);
+
+            
+            KeyDown += (s, e) =>
+            {
+                if(e.Key == Key.Return)
+                {
+                    CreateLookupDistances(Depots);
+                    CreateOptimizedRoute();
+                    Console.WriteLine("Route: " + OptimizedRoute.Count);
+
+                    for (int i = 0; i < OptimizedRoute.Count; i++)
+                    {
+                        AddDrawRoute(OptimizedRoute[i], OptimizedRoute[(i + 1) % OptimizedRoute.Count], OutputRoute);
+                        Console.WriteLine(OptimizedRoute[i]);
+                    }
+                    //Draw(OutputRoute, MapSection, RouteImage, RouteImageAnchor, Brushes.Red, Thickness / 3);
+                    Draw(OutputRoute, MapSection, Brushes.Black, Thickness / 4);
+                }
+                if(e.Key == Key.R)
+                {
+                    System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+                    Application.Current.Shutdown();
+                }
+            };
+            //DrawSingleNode(Start);
             MapSectionCover.PreviewMouseRightButtonUp += (s, e) =>
             {
                 var curr = e.GetPosition(MapSection);
@@ -107,6 +135,7 @@ namespace Optimized_Delivery_Simulation
             };
         }
 
+       
         private void MapSectionCover_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             BasePosition = Mouse.GetPosition(MapSectionCover);
@@ -125,9 +154,9 @@ namespace Optimized_Delivery_Simulation
                 double absLeft = CurrPosition.X - BasePosition.X;
                 double absTop = CurrPosition.Y - BasePosition.Y;
 
-                if (currTop + absTop >= -350 && currTop + absTop <= 700)
+                if (currTop+absTop <= limVertical && currTop + absTop >= -limVertical)
                     Canvas.SetTop(MapSection, currTop + absTop);
-                if (currLeft + absLeft <= 1300 && currLeft + absLeft >= -940)
+                if (currLeft+absLeft <= limHorizontal && currLeft + absLeft >= -limHorizontal)
                     Canvas.SetLeft(MapSection, currLeft + absLeft);
 
                 BasePosition = CurrPosition;
@@ -169,20 +198,11 @@ namespace Optimized_Delivery_Simulation
             }
 
             Depots.Add(Map[currPosition].Point);
-            DrawSingleNode(currPosition, NodeLayer, Brushes.Yellow, Thickness / 2);
+            DrawSingleNode(currPosition);
 
             if (Depots.Count == 5) 
             {
-                CreateLookupDistances(Depots);
-                CreateOptimizedRoute();
-                Console.WriteLine("Route: " + OptimizedRoute.Count);
-
-                for (int i = 0; i < OptimizedRoute.Count; i++)
-                {
-                    AddDrawRoute(OptimizedRoute[i], OptimizedRoute[(i + 1) % OptimizedRoute.Count], OutputRoute);
-                    Console.WriteLine(OptimizedRoute[i]);
-                }
-                Draw(OutputRoute, MapSection, RouteImage, RouteImageAnchor, Brushes.Red, Thickness / 3);
+                
             }
             //Console.WriteLine("///////////");
         }

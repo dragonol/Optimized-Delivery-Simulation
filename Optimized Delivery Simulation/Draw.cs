@@ -17,6 +17,14 @@ namespace Optimized_Delivery_Simulation
 {
     partial class MainWindow
     {
+        public void Draw(GeometryGroup geometryGroup, Canvas canvas, Brush color, double thickness)
+        {
+            Path path = new Path();
+            path.StrokeThickness = thickness;
+            path.Stroke = color;
+            path.Data = geometryGroup;
+            canvas.Children.Add(path);
+        }
         public void Draw(GeometryGroup geometries, UIElement element, Image image, System.Windows.Point pos, Brush color, double thickness)
         {
             GeometryDrawing geometryDrawing = new GeometryDrawing(
@@ -35,6 +43,49 @@ namespace Optimized_Delivery_Simulation
             Canvas.SetTop(image, pos.Y);
 
             ((Canvas)element).Children.Add(image);
+        }
+        public void DrawMap(GeometryGroup[] geometryGroups, Canvas canvas, double thickness)
+        {
+            Path path1 = new Path();
+            path1.Stroke = new SolidColorBrush(Color.FromRgb(0x37, 0xDC, 0x94));
+            path1.StrokeThickness = thickness;
+            path1.Data = geometryGroups[0];
+
+            Path path2 = new Path();
+            path2.Stroke = new SolidColorBrush(Color.FromRgb(0xFD, 0x9A, 0x28));
+            path2.StrokeThickness = thickness;
+            path2.Data = geometryGroups[1];
+
+            Path path3 = new Path();
+            path3.Stroke = new SolidColorBrush(Color.FromRgb(0xFA, 0x5C, 0x65));
+            path3.StrokeThickness = thickness;
+            path3.Data = geometryGroups[2];
+
+            Path path4 = new Path();
+            path4.Stroke = Brushes.Gray;
+            path4.StrokeThickness = thickness/2;
+            path4.Data = MapDirection.Clone();
+
+            Path path5 = new Path();
+            path5.Stroke = new SolidColorBrush(Color.FromRgb(0x26, 0x8A, 0xFF));
+            path5.StrokeThickness = thickness * 1.5;
+            path5.Data = MapNodes[0];
+
+            Path path6 = new Path();
+            path6.Stroke = Brushes.White;
+            path6.StrokeThickness = thickness;
+            path6.Data = MapNodes[1];
+
+            canvas.Children.Add(path1);
+            canvas.Children.Add(path2);
+            canvas.Children.Add(path3);
+            canvas.Children.Add(path4);
+            canvas.Children.Add(path5);
+            canvas.Children.Add(path6);
+
+            Canvas.SetZIndex(path4, 2);
+            Canvas.SetZIndex(path5, 2);
+            Canvas.SetZIndex(path6, 2);
         }
         public void DrawMap(GeometryGroup[] geometries, UIElement element, Image image, System.Windows.Point pos, double thickness)
         {
@@ -113,28 +164,21 @@ namespace Optimized_Delivery_Simulation
                 run = LookupPath[point1][run].Previous;
             }
         }
-        public void DrawSingleNode(System.Windows.Point point, UIElement element, Brush color, double thickness)
+        public void InitSingleNodesStorage(GeometryGroup geometryGroup, Canvas canvas, Brush color, double thickness)
+        {
+            Path singleNodes = new Path();
+            singleNodes.Stroke = color;
+            singleNodes.StrokeThickness = thickness;
+            singleNodes.Data = geometryGroup;
+            canvas.Children.Add(singleNodes);
+            Canvas.SetZIndex(singleNodes, 3);
+        }
+        public void DrawSingleNode(System.Windows.Point point)
         {
             RectangleGeometry rect = new RectangleGeometry(
-                new Rect(0, 0, 0, 0), 90, 90);
+                new Rect(point.X * Space, point.Y * Space, 0, 0), 90, 90);
 
-            GeometryDrawing geometryDrawing = new GeometryDrawing(
-                Brushes.Black,
-                new Pen(color, thickness), rect);
-            
-            DrawingImage drawingImage = new DrawingImage(geometryDrawing);
-            drawingImage.Freeze();
-
-            Image image = new Image();
-            image.Source = drawingImage;
-            image.Stretch = Stretch.None;
-            image.HorizontalAlignment = HorizontalAlignment.Center;
-            image.VerticalAlignment = VerticalAlignment.Center;
-
-            Canvas.SetLeft(image, point.X * Space + thickness);
-            Canvas.SetTop(image, point.Y * Space + thickness*13/8);
-
-            ((Canvas)element).Children.Add(image);
+            SingleNodes.Children.Add(rect);
         }
         
     }

@@ -30,11 +30,12 @@ namespace Optimized_Delivery_Simulation
             NodeUnit start = new NodeUnit(Random.Next(0, height - 1), Random.Next(0, width - 1));
             Start = start.Point;
 
-            Depots.Add(Start);
+            //Depots.Add(Start);
 
             BuildMap(start);
 
-            DrawMap(MapComponents, MapSection, MapImage, new System.Windows.Point(0,0), Thickness);
+            //DrawMap(MapComponents, MapSection, MapImage, new System.Windows.Point(0,0), Thickness);
+            DrawMap(MapComponents, MapSection, Thickness);
 
             void BuildMap(NodeUnit nodeUnit)
             {
