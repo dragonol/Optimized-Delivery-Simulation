@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Priority_Queue;
+using System.Diagnostics;
 
 namespace Optimized_Delivery_Simulation
 {
@@ -62,15 +63,19 @@ namespace Optimized_Delivery_Simulation
 
         public MainWindow()
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             InitializeComponent();
             GenerateMap(Brushes.PowderBlue);
             InitSingleNodesStorage(SingleNodes, MapSection, Brushes.Gold, Thickness / 2);
 
+            stopwatch.Stop();
             
             KeyDown += (s, e) =>
             {
                 if(e.Key == Key.Return)
                 {
+                    stopwatch.Start();
                     CreateLookupDistances(Depots);
                     CreateOptimizedRoute();
                     Console.WriteLine("Route: " + OptimizedRoute.Count);
@@ -80,6 +85,8 @@ namespace Optimized_Delivery_Simulation
                         AddDrawRoute(OptimizedRoute[i], OptimizedRoute[(i + 1) % OptimizedRoute.Count], OutputRoute);
                         Console.WriteLine(OptimizedRoute[i]);
                     }
+                    stopwatch.Stop();
+                    Console.WriteLine(stopwatch.ElapsedMilliseconds);
                     //Draw(OutputRoute, MapSection, RouteImage, RouteImageAnchor, Brushes.Red, Thickness / 3);
                     Draw(OutputRoute, MapSection, Brushes.Black, Thickness / 4);
                 }
@@ -182,8 +189,6 @@ namespace Optimized_Delivery_Simulation
             if (currPosition.X < 0 || currPosition.Y < 0 || Map.isNull(currPosition))
                 return;
 
-            
-            //Console.WriteLine("///////////");
             Console.WriteLine("currPos:" + currPosition);
             if(Map[currPosition] as NodeUnit != null)
             {
@@ -199,12 +204,6 @@ namespace Optimized_Delivery_Simulation
 
             Depots.Add(Map[currPosition].Point);
             DrawSingleNode(currPosition);
-
-            if (Depots.Count == 5) 
-            {
-                
-            }
-            //Console.WriteLine("///////////");
         }
 
         private void MapSectionCover_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
